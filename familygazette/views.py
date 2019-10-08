@@ -130,43 +130,46 @@ def update_profile(request):
     })
 
 @login_required
-def create_post(request, familyId):
+def create_post(request):
     error = False
     posted =  False
 
     if request.method == 'POST':
         posted = True
 
-    form = PostForm(request.POST or None, request.FILES or None)
+    form = PostForm(request.POST or None, request.FILES or None, user=request.user.profile)
+    
     if form.is_valid():
-        selected_family = get_object_or_404(Family, id=familyId)
-        new_post = Post()
-        new_post.title = form.cleaned_data['title']
-        new_post.photo = form.cleaned_data['photo']
-        new_post.user = request.user.profile
-        new_post.family = selected_family
-        new_post.save()
+        families = form.cleaned_data['families']
+        for family in families :
+            selected_family = get_object_or_404(Family, id=family.id)
+            new_post = Post()
+            new_post.title = form.cleaned_data['title']
+            new_post.photo = form.cleaned_data['photo']
+            new_post.user = request.user.profile
+            new_post.family = selected_family
+            new_post.save()
 
-        new_post.compressImage()
+            new_post.compressImage()
 
-        for member in selected_family.members.all() :
-            if member.newsletter and member.user.email :
-                subject = 'Nouveau post pour la famille ' + selected_family.name
-                content = 'Nouveau post : \'{0}\' par '.format(new_post.title, request.user.username)
-                context = {
-                    'subject': subject,
-                    'content': content,
-                    'url': 'family/' + str(selected_family.id)
-                }
-                html_message = render_to_string('mail.html', context)
-                plain_message = strip_tags(html_message)
-                mail.send_mail(
-                    subject,
-                    plain_message,
-                    'raspberrypi.devulder@gmail.com',
-                    [member.user.email],
-                    html_message=html_message
-                )
+            for member in selected_family.members.all() :
+                if member.newsletter and member.user.email :
+                    subject = 'Nouveau post pour la famille ' + selected_family.name
+                    content = 'Nouveau post : \'{0}\' par '.format(new_post.title, request.user.username)
+                    context = {
+                        'subject': subject,
+                        'content': content,
+                        'url': 'family/' + str(selected_family.id)
+                    }
+                    html_message = render_to_string('mail.html', context)
+                    plain_message = strip_tags(html_message)
+                    mail.send_mail(
+                        subject,
+                        plain_message,
+                        'raspberrypi.devulder@gmail.com',
+                        [member.user.email],
+                        html_message=html_message
+                    )
 
         return redirect('family', familyId=familyId)
     else:
