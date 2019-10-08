@@ -1,0 +1,25 @@
+{% extends "index.html" %}
+{% block content %}
+
+    <div class="card-header">
+        <strong>Membres de la famille {{family.name}}</strong>
+    </div>
+    <div class="card-body text-center">
+            <ul>
+                {% for profile in profiles %}
+                <a href="{% url 'getProfile' profile.id %}">
+                <li class="media">
+                    {% if profile.avatar %}
+                    <img src="{{profile.avatar.url}}" class="mr-3 avatar avatarPost" alt="Avatar">
+                    {% endif %}
+                    <div class="media-body">
+                        <h5 class="mt-0 mb-1">@{{profile.user.username}}</h5>
+                        <div>{{profile.user.first_name}} {{profile.user.last_name}}</div>
+                    </div>
+                </li>
+                </a>
+                {% endfor %}
+            </ul>
+    </div>
+
+{% endblock %}

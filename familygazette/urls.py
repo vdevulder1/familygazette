@@ -34,7 +34,8 @@ urlpatterns = [
     path('', views.home),
     path('home', views.home, name="home"),
     path('family/<int:familyId>', views.ListPosts.as_view(), name='family'),
-    path('profile', views.update_profile, name="updateProfile"),
+    path('profile/update', views.update_profile, name="updateProfile"),
+    path('profile/<int:profileId>', views.get_profile, name="getProfile"),
     path('family/<int:familyId>/new-post', views.create_post, name="newPost"),
     path('post/<int:postId>/delete', views.delete_post, name="deletePost"),
     path('post/<int:familyId>/<int:postId>/new-comment', views.create_comment, name="newComment"),
@@ -45,6 +46,7 @@ urlpatterns = [
     path('family/<int:familyId>/generate-document', views.generate_gazette),
     path('family/<int:familyId>/gazettes', views.ListGazettes.as_view(), name='gazettes'),
     path('family/download/<int:gazetteId>', views.download_gazette, name='downloadGazette'),
+    path('family/<int:familyId>/members', views.ListMembers.as_view(), name='members'),
 
 ]
 

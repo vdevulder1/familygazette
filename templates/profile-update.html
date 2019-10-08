@@ -1,0 +1,27 @@
+{% extends "index.html" %}
+{% block content %}
+
+   <div class="card-header">
+        Modification du profil
+   </div>
+   <div class="card-body text-center">
+
+        {% if error %}
+        <p><strong></strong></p>
+        <div class="alert alert-danger" role="alert">
+            Erreur lors de la saisie. Vérifiez les informations.
+        </div>
+        {% endif %}
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ user_form.as_p }}
+            {{ profile_form.as_p }}
+            <div class="container">
+                <button class="btn btn-success" type="submit">Sauvegarder</button>
+                <input type='button' value='Annuler' class="btn btn-danger" onclick="document.location.href='{% url 'home' %}';"/>
+            </div>
+        </form>
+   </div>
+
+{% endblock %}
