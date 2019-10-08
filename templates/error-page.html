@@ -1,0 +1,17 @@
+{% extends "index.html" %}
+{% block content %}
+
+   <div class="card-header">
+        <strong><h3>Erreur</h3></strong>
+   </div>
+   <div class="card-body text-center">
+        <div class="card-text">
+            Une erreur s'est produite. N'hésitez pas à envoyer un mail à <strong>vincentdevulder.pro@gmail.com</strong> en précisant le contexte ainsi que les informations suivantes :
+        </div>
+        <div>
+            <h4>{{ statusCode }}</h4>
+	    <p>{{ exception }}</p>
+        </div>
+   </div>
+
+{% endblock %}

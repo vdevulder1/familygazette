@@ -1,0 +1,51 @@
+"""familygazette URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/2.2/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path
+from . import views
+from django.conf.urls.static import static
+from django.conf import settings
+from django.conf.urls import (
+handler400, handler403, handler404, handler500
+)
+
+handler400 = 'familygazette.views.handler400'
+handler403 = 'familygazette.views.handler403'
+handler404 = 'familygazette.views.handler404'
+handler500 = 'familygazette.views.handler500'
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('login', views.logIn, name="login"),
+    path('logout', views.logOut, name="logout"),
+    path('', views.home),
+    path('home', views.home, name="home"),
+    path('family/<int:familyId>', views.ListPosts.as_view(), name='family'),
+    path('profile', views.update_profile, name="updateProfile"),
+    path('family/<int:familyId>/new-post', views.create_post, name="newPost"),
+    path('post/<int:postId>/delete', views.delete_post, name="deletePost"),
+    path('post/<int:familyId>/<int:postId>/new-comment', views.create_comment, name="newComment"),
+    path('comment/<int:familyId>/<int:commentId>/delete', views.delete_comment, name="deleteComment"),
+    path('suggestions', views.ListSuggestions.as_view(), name='suggestions'),
+    path('suggestions/new-suggestion', views.create_suggestion, name="newSuggestion"),
+    path('suggestions/<int:suggestionId>/like', views.like_suggestion, name="likeSuggestion"),
+    path('family/<int:familyId>/generate-document', views.generate_gazette),
+    path('family/<int:familyId>/gazettes', views.ListGazettes.as_view(), name='gazettes'),
+    path('family/download/<int:gazetteId>', views.download_gazette, name='downloadGazette'),
+
+]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

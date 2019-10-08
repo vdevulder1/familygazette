@@ -1,0 +1,50 @@
+{% extends "index.html" %}
+{% block content %}
+
+   <div class="card-header">
+        Suggestions d'amélioration
+   </div>
+   <div class="card-body">
+       {% if suggestions %}
+        <ul class="list-group list-group-flush">
+            {% for suggestion in suggestions %}
+                <li class="list-group-item">
+                    <div class="element_content">
+                        <span>
+                            {{suggestion.content}}
+                        </span>
+                        
+                        <div class="btnElement">
+                            <form method="POST">
+                                {% csrf_token %}
+                                <button class="btn" type="submit" formaction="{% url 'likeSuggestion' suggestion.id %}">
+                                    {% if user.profile in suggestion.likes.all %}
+                                        <i class="fas fa-thumbs-up"></i>
+                                    {% else %}
+                                        <i class="far fa-thumbs-up"></i>
+                                    {% endif %}
+                                </button>
+                            </form>
+                            <span style="margin-top: auto;margin-bottom: auto;">({{ suggestion.likes.count }})</span>
+                        </div>
+                        
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <div>Pas de suggestion pour le moment</div>
+        {% endif %}
+   </div>
+   <div class="card-footer">
+        <button class="btn btn-sm btn-primary btnNewElement" onclick="addSuggestion();"><i class="fas fa-plus"></i> Ajouter une suggestion</button>
+        <div id="suggestion" style="display: none;">
+            <form method="POST" action="{% url 'newSuggestion' %}">
+                {% csrf_token %}
+                <input type="text" name="content" style="width: 100%;" maxlength=500>
+                <button class="btn btn-success btnNewElement" type="submit">Envoyer</button>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

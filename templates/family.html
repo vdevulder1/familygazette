@@ -1,0 +1,113 @@
+{% extends "index.html" %}
+{% block content %}
+    
+    <div class="card-header">
+        <h5><strong>{{ family.name }}</strong></h5>
+        Dernières actualités
+        <button id="newPostButton" class="btn btn-lg btn-success" onclick="document.location.href='{% url 'newPost' family.id %}';"><i class='fas fa-edit'></i> Créer un nouveau post</button>
+    </div>
+    <div class="card-body">
+        {% if posts %}
+            {% for post in posts %}
+            <div class="card mb-3">
+                <div class="image-container">
+                    <img src="{{ post.photo.url }}" class="card-img-top">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ post.title }}</h5>
+                    <div class="post_header">
+                        <div class="card-text user_container">
+                            <span class="user_name">
+                                <small class="text-muted">{{ post.date }} by <strong>{{post.user}}</strong></small>
+                            </span>
+                            {% if post.user.avatar %}
+                                <img src="{{ post.user.avatar.url }}" alt="Avatar" class="avatar avatarPost">
+                            {% endif %}
+                        </div>
+                        {% if post.user == user.profile %}
+                            <div class=postButtons>
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger" type="submit" formaction="{% url 'deletePost' post.id %}"><i class="fas fa-trash-alt"></i> Supprimer</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            Commentaires
+                        </div>
+                        <div class="card-body">
+                            {% if post.comments %}
+                                <ul class="list-group list-group-flush">
+                                    {% for comment in post.comments %}
+                                        <li class="list-group-item">
+                                            <div>
+                                                <div class="user_container">
+                                                    {% if comment.user.avatar %}
+                                                        <img src="{{ comment.user.avatar.url }}" alt="Avatar" class="avatar avatarComment">
+                                                    {% endif %}
+                                                    <span class="user_name">
+                                                        <small>{{comment.user}} - {{comment.date}}</small>
+                                                    </span>    
+                                                </div>
+                                            </div>
+                                            <div class="element_content">
+                                                <span>
+                                                    {{comment.content}}
+                                                </span>
+                                                
+                                                <div class="btnElement">
+                                                    {% if comment.user == user.profile %}
+                                                        <form method="POST">
+                                                            {% csrf_token %}
+                                                            <button class="btn" type="submit" formaction="{% url 'deleteComment' family.id comment.id %}"><i class="fas fa-trash-alt"></i></button>
+                                                        </form>
+                                                    {% endif %}
+                                                </div>
+                                                
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <div class="noComment">Pas de commentaire à afficher.</div>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-sm btn-primary btnNewElement" onclick="addComment({{post.id}});"><i class="fas fa-plus"></i> Ajouter un commentaire</button>
+                            <div id="comment{{post.id}}" style="display: none;">
+                                <form method="POST" action="{% url 'newComment' family.id post.id %}">
+                                    {% csrf_token %}
+                                    <input type="text" name="content" style="width: 100%;" maxlength=400>
+                                    <button class="btn btn-success btnNewElement" type="submit">Envoyer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p><h6>Pas encore de publication.</h6></p>
+        {% endif %}
+    </div>
+    
+
+    {# Mise en forme de la pagination ici #}
+    {% if is_paginated %}
+        <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% for page in paginator.page_range %}
+                        {% if page == page_obj.number %}
+                            <li class="page-item active"><span class="page-link" href="#">{{ page }} <span class="sr-only">(current)</span></span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </nav>
+    {% endif %}
+    
+{% endblock %}

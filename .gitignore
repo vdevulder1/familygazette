@@ -1,0 +1,8 @@
+familygazette/settings.py
+familygazette/wsgi.py
+familygazette/__pycache__/*
+familygazette/migrations/*
+static/photos/*
+media
+familygazette_env
+db.sqlite3

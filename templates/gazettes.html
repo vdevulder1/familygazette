@@ -1,0 +1,26 @@
+{% extends "index.html" %}
+{% block content %}
+
+   <div class="card-header">
+		<h5><strong>{{ family.name }}</strong></h5>
+        Vos gazettes
+   </div>
+   <div class="card-body">
+       {% if gazettes %}
+        <ul class="list-group list-group-flush">
+            {% for gazette in gazettes %}
+                <li class="list-group-item">
+                    <div class="element_content">
+                        <span>
+                            <a href="{% url 'downloadGazette' gazette.id %}"><i class="fas fa-download"></i> {{gazette.name}}</a>
+                        </span>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <div>Pas de gazette pour le moment</div>
+        {% endif %}
+   </div>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% if user.is_authenticated %}
+     <div class="bg-dark text-white sidebar" id="sidebar-wrapper">
+          <div class="sidebar-heading">Actions</div>
+          <div class="list-group list-group-flush">
+               <a href="{% url 'home' %}" class="list-group-item list-group-item-action bg-dark text-white">Accueil</a>
+               {% for family in user.profile.families %}
+               <button class="list-group-item list-group-item-action bg-dark text-white" type="button" onclick="$('#family{{family.id}}').toggle('show');">
+                    {{family.name}}
+                    <div id="family{{family.id}}" style="display: none;">
+                         <ul style="list-style: none">
+                              <li style="padding: 2px">
+                                   <a href="{% url 'family' family.id %}" style="color: #fff"><i class="far fa-images"></i> Actualités</a>
+                              </li>
+                              <li style="padding: 2px">
+                                   <a href="{% url 'gazettes' family.id %}" style="color: #fff"><i class="far fa-newspaper"></i> Gazettes</a>
+                              </li>
+                         </ul>
+                    </div>
+               </button>
+               {% endfor %}
+               <a href="{% url 'suggestions' %}" class="list-group-item list-group-item-action bg-dark text-white">Suggestions</a>
+          </div>
+     </div>
+{% endif %}

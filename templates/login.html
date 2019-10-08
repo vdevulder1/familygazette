@@ -1,0 +1,38 @@
+{% extends "index.html" %}
+{% block content %}
+
+   <div class="card-header">
+         Bienvenu(e) sur FamilyGazette !
+   </div>
+   <div class="card-body text-center">
+
+      {% if error %}
+      <p><strong></strong></p>
+      <div class="alert alert-danger" role="alert">
+         Utilisateur inconnu ou mauvais de mot de passe.
+      </div>
+      {% endif %}
+      
+      {% if user.is_authenticated %}
+      <div class="alert alert-success" role="alert">
+         Vous êtes connecté(e), {{ user.username }} !
+      </div>
+
+      <div class="alert alert-info" role="alert">
+         <p>Vous pouvez dès à présent vous rendre dans l'onglet "Profil" (en cliquant sur votre nom en haut à droite) afin de renseigner vos informations.</p>
+         <p>En prime vous pouvez désormais avoir votre propre avatar !</p>
+	 <p>Par défaut vous êtes abonnés à la newsletter. Si vous souhaitez changer ce paramètre il suffit de se rendre dans l'onglet "Profil" cité précédemment.</p>
+      </div>
+      
+      {% else %}
+      <h3>Connexion</h3>
+      
+      <form method="post" action="/login">
+         {% csrf_token %}
+         {{ form.as_p }}
+         <input type="submit" value="Se connecter" />
+      </form>
+      {% endif %}
+   </div>
+
+{% endblock %}

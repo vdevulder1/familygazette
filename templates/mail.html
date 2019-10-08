@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">    
+	<style>
+		body {
+			font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+		        font-size: 1rem;
+	   		font-weight: 400;
+	    	    	line-height: 1.5;
+			color: #212529;
+			text-align: left;
+		}
+		.card {
+			position: relative;
+			display: -ms-flexbox;
+			display: flex;
+			-ms-flex-direction: column;
+			flex-direction: column;
+			min-width: 0;
+			max-width: 95vw;
+			margin-left: auto;
+			margin-right: auto;
+			word-wrap: break-word;
+			background-color: #fff;
+			background-clip: border-box;
+	    		border: 1px solid rgba(0,0,0,.125);
+			border-radius: .25rem;
+		}
+		.card-header {
+			padding: .75rem 1.25rem;
+			margin-bottom: 0;
+			background-color: rgba(0,0,0,.03);
+			border-bottom: 1px solid rgba(0,0,0,.125);
+			border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+		}
+		.card-body {
+			-ms-flex: 1 1 auto;
+			flex: 1 1 auto;
+			padding: 1.25rem;
+		}
+		.card-footer {
+			padding: .75rem 1.25rem;
+			background-color: rgba(0,0,0,.03);
+			border-top: 1px solid rgba(0,0,0,.125);
+			border-radius: 0 0 calc(.25rem - 1px) calc(.25rem - 1px);
+		}
+		a {
+			color: #007bff;
+			text-decoration: none;
+			background-color: transparent;
+		}
+		.img-div {
+			background-color: #009973;
+			padding: 10px;
+			margin-bottom: 15px;
+		}
+	</style>
+    </head>
+    <body>
+	<div class="img-div">
+		<img src="https://familygazette.fr/static/photos/logo_full.png">
+	</div>
+        <div class="card">
+            <div class="card-header">
+		    <h3>{{ subject }}</h3>
+            </div>
+            <div class="card-body text-center">
+                {{ content }}
+            </div>
+	    <a href="https://www.familygazette.fr/home">
+            <div class="card-footer">
+                Se rendre sur le site
+            </div>
+	    </a>
+        </div>
+    </body>
+</html>
