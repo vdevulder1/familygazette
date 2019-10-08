@@ -72,7 +72,7 @@ class Post(models.Model):
     title = models.CharField(max_length=100)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     date = models.DateTimeField(default=timezone.now, verbose_name="Date de publication")
-    family = models.ForeignKey(Family, on_delete=models.CASCADE)
+    family = models.ForeignKey(Family, on_delete=models.CASCADE, verbose_name="Famille")
     photo = models.ImageField(upload_to="photos/")
 
     class Meta:

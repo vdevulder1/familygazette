@@ -21,10 +21,19 @@ class FamilyForm(forms.ModelForm):
         model = Family
         fields = ('description',)
 
-class PostForm(forms.ModelForm):
-    class Meta:
-        model = Post
-        fields = ('title', 'photo')
+class PostForm(forms.Form):
+    title = forms.CharField(label="Titre", max_length=100)
+    photo = forms.ImageField()
+    families = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple, label="Famille(s) avec qui partager ce post")
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(PostForm, self).__init__(*args, **kwargs)
+
+        self.fields['families'].queryset = user.families
+
+        
+
 
 class CommentForm(forms.ModelForm):
     class Meta:
