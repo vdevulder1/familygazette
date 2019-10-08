@@ -79,6 +79,25 @@ class ListPosts(LoginRequiredMixin, ListView):
         context['family'] = get_object_or_404(Family, id=self.kwargs['familyId']) 
         return context
 
+class ListMembers(LoginRequiredMixin, ListView):
+    model = Profile
+    context_object_name = "profiles"
+    template_name = "profiles.html"
+
+    def get_queryset(self):
+        return get_object_or_404(Family, id=self.kwargs['familyId']).members.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(ListMembers, self).get_context_data(**kwargs)
+        context['family'] = get_object_or_404(Family, id=self.kwargs['familyId'])
+        return context
+
+@login_required
+def get_profile(request, profileId):
+    profile = get_object_or_404(Profile, id=profileId)
+
+    return render(request, 'profile.html', {'profile': profile})
+
 @login_required
 def update_profile(request):
     error = False
@@ -105,7 +124,7 @@ def update_profile(request):
     else:
         user_form = UserForm(instance=request.user)
         profile_form = ProfileForm(instance=request.user.profile)
-    return render(request, 'profile.html', {
+    return render(request, 'profile-update.html', {
         'user_form': user_form,
         'profile_form': profile_form
     })

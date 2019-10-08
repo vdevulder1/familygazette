@@ -132,6 +132,11 @@ img {
   border-radius: 50%;
 }
 
+.avatarProfile {
+  width: 250px;
+  height: 250px;
+}
+
 .avatarHeader {
   width: 40px;
   height: 40px;
@@ -139,8 +144,8 @@ img {
 }
 
 .avatarPost {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   margin-left: 10px;
   margin-bottom: 10px;
 }
@@ -172,4 +177,16 @@ img {
 .container-fluid {
   padding-bottom: 10px;
   padding-top: 10px;
+}
+
+.container .row {
+  margin: 10px;
+}
+
+li.media {
+  height: 80px;
+  padding: 5px;
+  margin: 20px;
+  border: 1px solid lightgray;
+  border-radius: 10px;
 }
