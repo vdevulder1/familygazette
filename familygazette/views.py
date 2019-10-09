@@ -130,7 +130,7 @@ def update_profile(request):
     })
 
 @login_required
-def create_post(request):
+def create_post(request, familyId):
     error = False
     posted =  False
 

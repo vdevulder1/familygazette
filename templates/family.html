@@ -4,7 +4,7 @@
     <div class="card-header">
         <h5><strong>{{ family.name }}</strong></h5>
         Dernières actualités
-        <button id="newPostButton" class="btn btn-lg btn-success" onclick="document.location.href='{% url 'newPost' %}';"><i class='fas fa-edit'></i> Créer un nouveau post</button>
+        <button id="newPostButton" class="btn btn-lg btn-success" onclick="document.location.href='{% url 'newPost' family.id %}';"><i class='fas fa-edit'></i> Créer un nouveau post</button>
     </div>
     <div class="card-body">
         {% if posts %}
