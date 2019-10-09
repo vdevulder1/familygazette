@@ -21,7 +21,8 @@
       <div class="alert alert-info" role="alert">
          <p>Vous pouvez dès à présent vous rendre dans l'onglet "Profil" (en cliquant sur votre nom en haut à droite) afin de renseigner vos informations.</p>
          <p>En prime vous pouvez désormais avoir votre propre avatar !</p>
-	 <p>Par défaut vous êtes abonnés à la newsletter. Si vous souhaitez changer ce paramètre il suffit de se rendre dans l'onglet "Profil" cité précédemment.</p>
+         <p>Par défaut vous êtes abonnés à la newsletter. Si vous souhaitez changer ce paramètre il suffit de se rendre dans l'onglet "Profil" cité précédemment.</p>
+         <p>Il est également désormais possible de <strong>modifier votre mot de passe</strong>.</p>
       </div>
       
       {% else %}
@@ -30,7 +31,8 @@
       <form method="post" action="/login">
          {% csrf_token %}
          {{ form.as_p }}
-         <input type="submit" value="Se connecter" />
+         <button class="btn btn-outline-success" type="submit">Se connecter</button>
+         <a href="{% url 'password_reset' %}"><button class="btn btn-outline-dark" type="button">Mot de passe oublié</button></a>
       </form>
       {% endif %}
    </div>

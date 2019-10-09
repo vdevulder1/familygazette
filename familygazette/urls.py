@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, reverse_lazy
 from django.contrib.auth import views as auth_views
 from . import views
 from django.conf.urls.static import static
@@ -32,16 +32,17 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login', views.logIn, name="login"),
     path('logout', views.logOut, name="logout"),
-    path('password/change/', auth_views.PasswordChangeView.as_view(), name="password_change"),
-    path('password/change/done/', auth_views.PasswordChangeDoneView.as_view(), name="password_change_done"),
-    path('password/reset/', auth_views.PasswordResetView.as_view(), name="password_reset"),
-    path('password/reset/done/', auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
-    path('password/reset/confirm/', auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
+    path('password/change/', auth_views.PasswordChangeView.as_view(template_name='password-update.html'), name="password_change"),
+    path('password/change/done/', auth_views.PasswordChangeDoneView.as_view(template_name='success.html'), name="password_change_done"),
+    path('password/reset/', auth_views.PasswordResetView.as_view(template_name='password-update.html'), name="password_reset"),
+    path('password/reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='success.html'), name="password_reset_done"),
+    path('password/reset/confirm/', auth_views.PasswordResetConfirmView.as_view(template_name='password-update.html'), name="password_reset_confirm"),
     path('', views.home),
     path('home', views.home, name="home"),
     path('family/<int:familyId>', views.ListPosts.as_view(), name='family'),
     path('profile/update', views.update_profile, name="updateProfile"),
     path('profile/<int:profileId>', views.get_profile, name="getProfile"),
+    path('profile/me', views.my_profile, name="myProfile"),
     path('post/<int:familyId>/new-post', views.create_post, name="newPost"),
     path('post/<int:postId>/delete', views.delete_post, name="deletePost"),
     path('post/<int:familyId>/<int:postId>/new-comment', views.create_comment, name="newComment"),
