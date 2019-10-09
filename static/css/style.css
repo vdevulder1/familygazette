@@ -190,3 +190,11 @@ li.media {
   border: 1px solid lightgray;
   border-radius: 10px;
 }
+
+#pwdChange {
+  width: 25%;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  margin-left: auto;
+  margin-right: auto;
+}

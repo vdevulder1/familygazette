@@ -1,0 +1,24 @@
+{% extends "index.html" %}
+{% block content %}
+      
+    {% if user.is_authenticated %}
+    <div class="card-header">
+        <h3>Changement de mot de passe</h3>
+    </div>
+    <div class="card-body text-center">
+        <div class="alert alert-success" role="alert">
+            Votre mot de passe a été modifié.
+        </div>
+    {% else %}
+    <div class="card-header">
+        Réinitialisation du mot de passe
+    </div>
+    <div class="card-body text-center">
+        <div class="alert alert-success" role="alert">
+            Un email vous a été envoyé.
+        </div>
+    {% endif %}
+      
+   </div>
+
+{% endblock %}

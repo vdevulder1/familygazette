@@ -93,7 +93,17 @@ class ListMembers(LoginRequiredMixin, ListView):
         return context
 
 @login_required
+def my_profile(request):
+    profile = get_object_or_404(Profile, id=request.user.profile.id)
+
+    return render(request, 'profile.html', {'profile': profile})
+
+@login_required
 def get_profile(request, profileId):
+
+    if profileId == request.user.profile.id :
+        return redirect('myProfile')
+
     profile = get_object_or_404(Profile, id=profileId)
 
     return render(request, 'profile.html', {'profile': profile})
