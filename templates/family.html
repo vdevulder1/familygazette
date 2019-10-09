@@ -101,7 +101,7 @@
                 <ul class="pagination justify-content-center">
                     {% for page in paginator.page_range %}
                         {% if page == page_obj.number %}
-                            <li class="page-item active"><span class="page-link" href="#">{{ page }} <span class="sr-only">(current)</span></span></li>
+                            <li class="page-item active"><span class="page-link" href="#">{{ page }} <span class="sr-only"></span></span></li>
                         {% else %}
                             <li class="page-item"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
                         {% endif %}

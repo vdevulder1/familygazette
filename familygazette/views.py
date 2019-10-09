@@ -152,10 +152,10 @@ def create_post(request, familyId):
 
             new_post.compressImage()
 
-            for member in selected_family.members.all() :
+            for member in selected_family.members.all().exclude(user=request.user) :
                 if member.newsletter and member.user.email :
                     subject = 'Nouveau post pour la famille ' + selected_family.name
-                    content = 'Nouveau post : \'{0}\' par '.format(new_post.title, request.user.username)
+                    content = 'Nouveau post : \'{0}\' par {1}'.format(new_post.title, request.user.username)
                     context = {
                         'subject': subject,
                         'content': content,
@@ -235,14 +235,13 @@ def create_comment(request, familyId, postId):
                     }
                     html_message = render_to_string('mail.html', context)
                     plain_message = strip_tags(html_message)
-                    messages.append(
+                    mail.send_mail(
                         subject,
                         plain_message,
                         'raspberrypi.devulder@gmail.com',
                         [user.user.email],
                         html_message=html_message
                     )
-            mail.send_mass_mail(tuple(messages))
 
         return redirect('family', familyId=familyId)
     else:
