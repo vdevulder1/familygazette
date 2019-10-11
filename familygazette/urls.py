@@ -45,6 +45,7 @@ urlpatterns = [
     path('profile/<int:profileId>', views.get_profile, name="getProfile"),
     path('profile/me', views.my_profile, name="myProfile"),
     path('post/<int:familyId>/new-post', views.create_post, name="newPost"),
+    path('post/<int:postId>/update', views.update_post, name="updatePost"),
     path('post/<int:postId>/delete', views.delete_post, name="deletePost"),
     path('post/<int:familyId>/<int:postId>/new-comment', views.create_comment, name="newComment"),
     path('comment/<int:familyId>/<int:commentId>/delete', views.delete_comment, name="deleteComment"),
@@ -55,7 +56,7 @@ urlpatterns = [
     path('family/<int:familyId>/gazettes', views.ListGazettes.as_view(), name='gazettes'),
     path('family/download/<int:gazetteId>', views.download_gazette, name='downloadGazette'),
     path('family/<int:familyId>/members', views.ListMembers.as_view(), name='members'),
-
+    path('<str:model>/<int:modelId>/rotate/<int:rotation>', views.rotate_img, name="rotate"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

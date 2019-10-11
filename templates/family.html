@@ -4,7 +4,7 @@
     <div class="card-header">
         <h5><strong>{{ family.name }}</strong></h5>
         Dernières actualités
-        <button id="newPostButton" class="btn btn-lg btn-success" onclick="document.location.href='{% url 'newPost' family.id %}';"><i class='fas fa-edit'></i> Créer un nouveau post</button>
+        <button id="newPostButton" class="btn  btn-success" onclick="document.location.href='{% url 'newPost' family.id %}';"><i class="far fa-plus-square"></i> Créer un nouveau post</button>
     </div>
     <div class="card-body">
         {% if posts %}
@@ -25,10 +25,11 @@
                             {% endif %}
                         </div>
                         {% if post.user == user.profile %}
-                            <div class=postButtons>
+                            <div class="postButtons">
+                                <a href="{% url 'updatePost' post.id %}"><button class="btn btn-info" type="button"><i class='fas fa-edit'></i> Modifier</button></a>
                                 <form method="POST">
                                     {% csrf_token %}
-                                    <button class="btn btn-danger" type="submit" formaction="{% url 'deletePost' post.id %}"><i class="fas fa-trash-alt"></i> Supprimer</button>
+                                    <button class="btn btn-sm btn-outline-danger" type="submit" formaction="{% url 'deletePost' post.id %}"><i class="fas fa-trash-alt"></i> Supprimer</button>
                                 </form>
                             </div>
                         {% endif %}
