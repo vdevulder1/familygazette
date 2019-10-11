@@ -49,21 +49,6 @@ ul {
   margin-left: 0;
 }
 
-@media (min-width: 768px) {
-  #sidebar-wrapper {
-    margin-left: 0;
-  }
-
-  #page-content-wrapper {
-    min-width: 0;
-    width: 100%;
-  }
-
-  #wrapper.toggled #sidebar-wrapper {
-    margin-left: -15rem;
-  }
-}
-
 #newPostButton {
   margin: 20px;
   padding: 10px;
@@ -72,38 +57,6 @@ ul {
 
 .post_header {
   display: inline;
-}
-
-@media (max-width: 600px) {
-
-  #newPostButton {
-    padding: 10px;
-    font-size: inherit;
-  }
-
-	.postButtons {
-		margin-bottom: 10px;
-		margin-left: 10px;
-	}
-
-	.post_header {
-		display: inline-grid;
-	}
-
-	.card .card-body {
-		padding-right:0;
-    padding-left:0;
-  }
-  
-  .card-body .card {
-    border-left-width: 0px;
-    border-right-width: 0px;
-  }
-
-  .card-title, .noComment {
-    margin-left: 10px;
-    margin-right: 10px;
-  }
 }
 
 .postButtons {
@@ -146,8 +99,11 @@ img {
 }
 
 .avatarProfile {
-  width: 250px;
-  height: 250px;
+  width: 200px;
+  height: 200px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 0 1em grey;
 }
 
 .avatarHeader {
@@ -166,6 +122,10 @@ img {
 .avatarComment {
   width: 30px;
   height: 30px;
+}
+
+.profileName {
+  font-size: 2rem;
 }
 
 .user_container {
@@ -196,12 +156,13 @@ img {
   margin: 10px;
 }
 
-li.media {
+li.member {
   height: 80px;
   padding: 5px;
   margin: 20px;
   border: 1px solid lightgray;
   border-radius: 10px;
+  display: flex;
 }
 
 #pwdChange {
@@ -217,4 +178,69 @@ li.media {
   max-height: 50vh;
   margin-bottom: 30px;
   box-shadow: 0 0 1em black;
+}
+
+@media (min-width: 768px) {
+  #sidebar-wrapper {
+    margin-left: 0;
+  }
+
+  #page-content-wrapper {
+    min-width: 0;
+    width: 100%;
+  }
+
+  #wrapper.toggled #sidebar-wrapper {
+    margin-left: -15rem;
+  }
+}
+
+@media (max-width: 768px) {
+
+  #newPostButton {
+    padding: 10px;
+    font-size: inherit;
+  }
+
+	.postButtons {
+		margin-bottom: 10px;
+		margin-left: 10px;
+	}
+
+	.post_header {
+		display: inline-grid;
+	}
+
+	.card .card-body {
+		padding-right:0;
+    padding-left:0;
+  }
+  
+  .card-body .card {
+    border-left-width: 0px;
+    border-right-width: 0px;
+  }
+
+  .card-title, .noComment {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  
+  .avatarProfile {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profileName {
+    font-size: 1.5rem;
+  }
+
+  #pwdChange {
+    width: 80%;
+  }
+
+  li.member {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
 }

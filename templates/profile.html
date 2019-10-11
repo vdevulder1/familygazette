@@ -5,12 +5,12 @@
         {% if profile == user.profile %}<strong>Vos informations</strong>{% else %}<strong>Profil de {{profile.user.username}}</strong>{% endif %}
     </div>
     <div class="card-body text-center">
-        <div class="media">
+        <div class="post_header">
             {% if profile.avatar %}
-            <img src="{{ profile.avatar.url }}" class="mr-3 avatar avatarProfile" alt="Avatar">
+            <img src="{{ profile.avatar.url }}" class="avatar avatarProfile" alt="Avatar">
             {% endif %}
             <div class="media-body">
-                <h2 class="mt-0"><strong>{{profile.user.first_name}} {{profile.user.last_name}}</strong></h2>
+                <div class="profileName"><strong>{{profile.user.first_name}} {{profile.user.last_name}}</strong></div>
                 <div class="container" style="border: 1px solid #009973; border-radius: 10px;">
                     <div class="row">
                         <div class="input-group flex-nowrap col">

@@ -137,7 +137,8 @@ def update_profile(request):
         profile_form = ProfileForm(instance=request.user.profile)
     return render(request, 'profile-update.html', {
         'user_form': user_form,
-        'profile_form': profile_form
+        'profile_form': profile_form,
+        'error': error
     })
 
 @login_required
@@ -217,7 +218,8 @@ def update_post(request, postId):
             form = UpdatePostForm(instance=post)
         return render(request, 'new-post.html', {
             'form': form,
-            'postId': postId
+            'postId': postId,
+            'error': error
         })
     else :
         return HttpResponseForbidden("Action Forbidden.")
