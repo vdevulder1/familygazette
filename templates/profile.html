@@ -41,12 +41,13 @@
 
         </div>
 
-       
+        {% if profile == user.profile %}
         <div class="alert alert-warning" role="alert" id="pwdChange">
             <a href="{% url 'password_change' %}" style="color: #856404;">
                 Modifier votre mot de passe
             </a>
         </div>
+        {% endif %}
         
     </div>
     {% if profile == user.profile %}
