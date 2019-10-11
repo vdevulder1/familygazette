@@ -9,7 +9,7 @@ $(document).ready(function () {
         var width = $(this).width();
         var height = $(this).height();
         
-        if (height > width) {
+        if (height > width && height > $(window).height()) {
             let ratio = width/height;
             let new_width = ratio*100;
             $(this).css("height", "100vh");

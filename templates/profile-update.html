@@ -6,6 +6,33 @@
    </div>
    <div class="card-body text-center">
 
+        {% if profile_form.avatar.value %}
+            <div>
+                <img class="imgDisplay avatar" src="/media/{{ profile_form.avatar.value }}">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <div class="btn-group dropright">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-undo"></i> Tourner
+                    </button>
+                    <div class="dropdown-menu">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <button class="dropdown-item" type="submit" formaction="{% url 'rotate' 'profile' user.id  1 %}">90°</button>
+                        </form>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <button class="dropdown-item" type="submit" formaction="{% url 'rotate' 'profile' user.id 2 %}">180°</button>
+                        </form>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <button class="dropdown-item" type="submit" formaction="{% url 'rotate' 'profile' user.id 3 %}">270°</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
         {% if error %}
         <p><strong></strong></p>
         <div class="alert alert-danger" role="alert">

@@ -32,7 +32,10 @@ class PostForm(forms.Form):
 
         self.fields['families'].queryset = user.families
 
-        
+class UpdatePostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ('title', 'photo')
 
 
 class CommentForm(forms.ModelForm):

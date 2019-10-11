@@ -65,7 +65,9 @@ ul {
 }
 
 #newPostButton {
-  margin-left: 20px;
+  margin: 20px;
+  padding: 10px;
+  font-size: 20px;
 }
 
 .post_header {
@@ -73,6 +75,12 @@ ul {
 }
 
 @media (max-width: 600px) {
+
+  #newPostButton {
+    padding: 10px;
+    font-size: inherit;
+  }
+
 	.postButtons {
 		margin-bottom: 10px;
 		margin-left: 10px;
@@ -100,6 +108,11 @@ ul {
 
 .postButtons {
   float: right;
+  display: flex;
+}
+
+.postButtons button {
+  margin: 5px;
 }
 
 .btnNewElement  {
@@ -197,4 +210,11 @@ li.media {
   margin-bottom: 30px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.imgDisplay {
+  max-width: 75%;
+  max-height: 50vh;
+  margin-bottom: 30px;
+  box-shadow: 0 0 1em black;
 }

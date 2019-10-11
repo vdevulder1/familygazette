@@ -2,7 +2,7 @@
 {% block content %}
 
    <div class="card-header">
-        Nouveau post
+        {% if postId %}Modification d'un post{% else %}Nouveau post{% endif %}
    </div>
    <div class="card-body text-center">
 
@@ -11,6 +11,33 @@
         <div class="alert alert-danger" role="alert">
             Erreur lors de la saisie. Vérifiez les informations.
         </div>
+        {% endif %}
+        
+        {% if form.photo.value %}
+            <div>
+                <img class="imgDisplay" src="/media/{{ form.photo.value }}">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <div class="btn-group dropright">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-undo"></i> Tourner
+                    </button>
+                    <div class="dropdown-menu">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <button class="dropdown-item" type="submit" formaction="{% url 'rotate' 'post' postId  1 %}">90°</button>
+                        </form>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <button class="dropdown-item" type="submit" formaction="{% url 'rotate' 'post' postId 2 %}">180°</button>
+                        </form>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <button class="dropdown-item" type="submit" formaction="{% url 'rotate' 'post' postId 3 %}">270°</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         {% endif %}
         
         <form method="post" enctype="multipart/form-data">

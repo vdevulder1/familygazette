@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.views.generic import ListView, DeleteView
 from django.contrib.auth.decorators import login_required
 from .models import Family, Post, Comment, Profile, Suggestion, Gazette
-from .forms import LoginForm, UserForm, ProfileForm, PostForm, CommentForm, SuggestionForm
+from .forms import LoginForm, UserForm, ProfileForm, PostForm, UpdatePostForm, CommentForm, SuggestionForm
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
@@ -14,10 +14,11 @@ from django.core import mail
 from django.template.loader import render_to_string, get_template
 from django.template import RequestContext
 from django.utils.html import strip_tags
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from django.conf import settings
 import xlwt, zipfile, os
 from django.core.files.storage import FileSystemStorage
+from PIL import Image
 
 def handler400(request, exception):
     statusCode = 400
@@ -128,7 +129,7 @@ def update_profile(request):
                 if profile.avatar :
                     profile.compressAvatar()
 
-            return redirect(home)
+            return redirect(my_profile)
         else:
             error = True
     else:
@@ -186,6 +187,40 @@ def create_post(request, familyId):
         error = True
     
     return render(request, 'new-post.html', locals())
+
+@login_required
+def update_post(request, postId):
+    error = False
+    posted = False
+    post = get_object_or_404(Post, id=postId)
+
+    if request.user.profile == post.user :
+        if request.method == 'POST':
+            posted = True
+            form = UpdatePostForm(request.POST, request.FILES, instance=post)
+            if form.is_valid():
+                photoHasChanged = False
+                if 'photo' in form.changed_data :
+                    photoHasChanged = True
+                    get_object_or_404(Post, id=postId).photo.delete()
+                form.save()
+
+                if photoHasChanged:
+                    post_ = get_object_or_404(Post, id=postId)
+                    if post_.photo :
+                        post_.compressImage()
+
+                return redirect('family', familyId=post.family.id)
+            else:
+                error = True
+        else:
+            form = UpdatePostForm(instance=post)
+        return render(request, 'new-post.html', {
+            'form': form,
+            'postId': postId
+        })
+    else :
+        return HttpResponseForbidden("Action Forbidden.")
 
 @login_required
 @require_POST
@@ -396,3 +431,30 @@ def download_gazette(request, gazetteId):
             return response
     else:
         return HttpResponseNotFound('The requested pdf was not found in our server.')
+
+@login_required
+@require_POST
+def rotate_img(request, model, modelId, rotation):
+
+    if model == 'post' :
+        obj = get_object_or_404(Post, id=modelId)
+        if request.user.profile == obj.user :
+            path = obj.photo.path
+        else :
+            return HttpResponseForbidden("Action Forbidden.")
+    elif model == 'profile':
+        obj = get_object_or_404(Profile, id=request.user.id)
+        path = obj.avatar.path
+    else :
+        return HttpResponseForbidden("Action Forbidden.")
+    
+    rotate = [Image.ROTATE_90, Image.ROTATE_180, Image.ROTATE_270]
+    
+    image = Image.open(path)
+    image = image.transpose(rotate[rotation-1])
+    image.save(path)
+
+    if model == 'profile':
+        return redirect('updateProfile')
+    else : 
+        return redirect('update{0}'.format(model.capitalize()), modelId)
