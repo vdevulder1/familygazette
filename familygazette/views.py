@@ -60,6 +60,13 @@ def logOut(request):
     return redirect(reverse(logIn))
 
 @login_required
+def accessMedia(request):
+    response = HttpResponse('')
+    response['X-Accel-Redirect'] = request.path.replace('media', 'files')
+    response['Content-Type'] = ''
+    return response
+
+@login_required
 def home(request):
     """Page d'accueil"""
 
