@@ -178,7 +178,7 @@ def create_post(request, familyId):
                     mail.send_mail(
                         subject,
                         plain_message,
-                        'raspberrypi.devulder@gmail.com',
+                        settings.EMAIL_HOST_USER,
                         [member.user.email],
                         html_message=html_message
                     )
@@ -263,7 +263,7 @@ def create_comment(request, familyId, postId):
             mail.send_mail(
                 subject,
                 plain_message,
-                'raspberrypi.devulder@gmail.com',
+                settings.EMAIL_HOST_USER,
                 [selected_post.user.user.email],
                 html_message=html_message
             )
@@ -285,7 +285,7 @@ def create_comment(request, familyId, postId):
                     mail.send_mail(
                         subject,
                         plain_message,
-                        'raspberrypi.devulder@gmail.com',
+                        settings.EMAIL_HOST_USER,
                         [user.user.email],
                         html_message=html_message
                     )
@@ -335,8 +335,8 @@ def create_suggestion(request):
         mail.send_mail(
             subject,
             plain_message,
-            'raspberrypi.devulder@gmail.com',
-            ['lion1997@hotmail.fr'],
+            settings.EMAIL_HOST_USER,
+            [Profile.objects.get(user__username='vdevulder').user.email],
             html_message=html_message
         )
         return redirect('suggestions')
