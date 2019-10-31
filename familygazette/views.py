@@ -151,6 +151,7 @@ def update_profile(request):
 @login_required
 def create_post(request, familyId):
     error = False
+    update = False
     posted =  False
 
     if request.method == 'POST':
@@ -160,11 +161,12 @@ def create_post(request, familyId):
     
     if form.is_valid():
         families = form.cleaned_data['families']
+        uploaded_photo = form.cleaned_data['photo']
         for family in families :
             selected_family = get_object_or_404(Family, id=family.id)
             new_post = Post()
             new_post.title = form.cleaned_data['title']
-            new_post.photo = form.cleaned_data['photo']
+            new_post.photo = uploaded_photo
             new_post.user = request.user.profile
             new_post.family = selected_family
             new_post.save()
@@ -200,6 +202,7 @@ def create_post(request, familyId):
 def update_post(request, postId):
     error = False
     posted = False
+    update = True
     post = get_object_or_404(Post, id=postId)
 
     if request.user.profile == post.user :
