@@ -419,7 +419,7 @@ class ListGazettes(LoginRequiredMixin, ListView):
     model = Gazette
     context_object_name = "gazettes"
     template_name = "gazettes.html"
-    paginate_by = 5 # attribut de pagination
+    #paginate_by = 5 # attribut de pagination
 
     def get_queryset(self):
         return Gazette.objects.filter(family__id=self.kwargs['familyId'])

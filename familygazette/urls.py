@@ -32,7 +32,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login', views.logIn, name="login"),
     path('logout', views.logOut, name="logout"),
-    re_path(r'^media', views.accessMedia),
+    #re_path(r'^media', views.accessMedia),
     path('password/change/', auth_views.PasswordChangeView.as_view(), name="password_change"),
     path('password/change/done/', auth_views.PasswordChangeDoneView.as_view(), name="password_change_done"),
     path('password/reset/', auth_views.PasswordResetView.as_view(), name="password_reset"),

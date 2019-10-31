@@ -10,8 +10,11 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # La liaison OneToOne vers le modèle User
+    birthday = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True, verbose_name="Date de naissance")
     avatar = models.ImageField(null=True, blank=True, upload_to="avatars/")
-    newsletter = models.BooleanField(default=True)
+    generalNewsletter = models.BooleanField(default=True, verbose_name="Newsletter générale")
+    postNewsletter = models.BooleanField(default=True, verbose_name="Suivi de post")
+    commentNewsletter = models.BooleanField(default=True, verbose_name="Suivi de commentaire")
 
     def __str__(self):
         return self.user.username

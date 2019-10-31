@@ -14,7 +14,10 @@ class UserForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ('avatar', 'newsletter')
+        fields = ('avatar', 'birthday', 'generalNewsletter', 'postNewsletter', 'commentNewsletter')
+        widgets = {
+            'birthday': forms.SelectDateWidget(years=range(1950,2010))
+        }
 
 class FamilyForm(forms.ModelForm):
     class Meta:
