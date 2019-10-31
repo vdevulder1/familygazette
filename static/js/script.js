@@ -20,8 +20,13 @@ $(document).ready(function () {
 });
 
 function addComment(nb) {
-    comment = "#comment" + nb;
+    comment = "#post" + nb;
     $(comment).toggle('show');
+}
+
+function updateComment(nb) {
+    comment = "#comment" + nb;
+    $(comment).prop('readonly', false);
 }
 
 function addSuggestion() {

@@ -153,6 +153,10 @@ img {
   display: inline-flex;
 }
 
+.btnElement>button:hover {
+  background-color: lightgrey;
+}
+
 .element_content {
   display: inline;
 }

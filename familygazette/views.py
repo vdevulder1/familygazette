@@ -237,13 +237,15 @@ def update_post(request, postId):
 @login_required
 @require_POST
 def delete_post(request, postId):
-
     post = get_object_or_404(Post, id=postId)
-    familyId = post.family.id
-    post.photo.delete()
-    post.delete()
+    if request.user.profile == post.user :
+        familyId = post.family.id
+        post.photo.delete()
+        post.delete()
 
-    return redirect('family', familyId=familyId)
+        return redirect('family', familyId=familyId)
+    else:
+        return HttpResponseForbidden("Action Forbidden.")
 
 @login_required
 @require_POST
@@ -304,14 +306,33 @@ def create_comment(request, familyId, postId):
     else:
         error = True
         return redirect('family', familyId=familyId)
+
+@login_required
+@require_POST
+def update_comment(request, commentId):
+    
+    comment = get_object_or_404(Comment, id=commentId)
+    if request.user.profile == comment.user :
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect('family', familyId=comment.post.family.id)
+        else:
+            return redirect('family', familyId=comment.post.family.id)
+    else:
+        return HttpResponseForbidden("Action Forbidden.")
+
     
 @login_required
 @require_POST
-def delete_comment(request, familyId, commentId):
+def delete_comment(request, commentId):
 
-    get_object_or_404(Comment, id=commentId).delete()
-
-    return redirect('family', familyId=familyId)
+    comment = get_object_or_404(Comment, id=commentId)
+    if request.user.profile == comment.user :
+        comment.delete()
+        return redirect('family', familyId=comment.post.family.id)
+    else:
+        return HttpResponseForbidden("Action Forbidden.")
 
 class ListSuggestions(LoginRequiredMixin, ListView):
     model = Suggestion
