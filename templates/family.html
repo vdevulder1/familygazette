@@ -27,10 +27,29 @@
                         {% if post.user == user.profile %}
                             <div class="postButtons">
                                 <a href="{% url 'updatePost' post.id %}"><button class="btn btn-info" type="button"><i class='fas fa-edit'></i> Modifier</button></a>
-                                <form method="POST">
-                                    {% csrf_token %}
-                                    <button class="btn btn-sm btn-outline-danger" type="submit" formaction="{% url 'deletePost' post.id %}"><i class="fas fa-trash-alt"></i> Supprimer</button>
-                                </form>
+                                <button class="btn btn-sm btn-outline-danger" type="button" data-toggle="modal" data-target="#modalPost{{post.id}}"><i class="fas fa-trash-alt"></i> Supprimer</button>
+                                <div class="modal fade" id="modalPost{{post.id}}" tabindex="-1" role="dialog" aria-labelledby="modalPost{{post.id}}Label" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="modalPost{{post.id}}Label">Confirmation</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Voulez-vous vraiment supprimer le post '{{post.title}}' ?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                                <form method="POST">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger" formaction="{% url 'deletePost' post.id %}">Supprimer</button>
+                                                </form>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
                             </div>
                         {% endif %}
                     </div>
@@ -55,16 +74,40 @@
                                             </div>
                                             <div class="element_content">
                                                 <span>
-                                                    {{comment.content}}
+                                                    <form method="POST" action="{% url 'updateComment' comment.id %}">
+                                                        {% csrf_token %}
+                                                        <input type="text" id="comment{{comment.id}}" name="content" style="width: 100%;" maxlength=400 value="{{comment.content}}" readonly>
+                                                    </form>
                                                 </span>
                                                 
                                                 <div class="btnElement">
                                                     {% if comment.user == user.profile %}
-                                                        <form method="POST">
-                                                            {% csrf_token %}
-                                                            <button class="btn" type="submit" formaction="{% url 'deleteComment' family.id comment.id %}"><i class="fas fa-trash-alt"></i></button>
-                                                        </form>
+                                                        <button class="btn" onclick="updateComment({{comment.id}});"><i class="fas fa-pen"></i></button>
+                                                        <button class="btn" type="button" data-toggle="modal" data-target="#modalComment{{comment.id}}"><i class="fas fa-trash-alt"></i></button>
                                                     {% endif %}
+                                                </div>
+
+                                                <div class="modal fade" id="modalComment{{comment.id}}" tabindex="-1" role="dialog" aria-labelledby="modalComment{{comment.id}}Label" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="modalComment{{comment.id}}Label">Confirmation</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            Voulez-vous vraiment supprimer le commentaire '{{comment.content}}' ?
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                                            <form method="POST">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="btn btn-danger" formaction="{% url 'deleteComment' comment.id %}">Supprimer</button>
+                                                            </form>
+                                                        </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 
                                             </div>
@@ -77,7 +120,7 @@
                         </div>
                         <div class="card-footer">
                             <button class="btn btn-sm btn-primary btnNewElement" onclick="addComment({{post.id}});"><i class="fas fa-plus"></i> Ajouter un commentaire</button>
-                            <div id="comment{{post.id}}" style="display: none;">
+                            <div id="post{{post.id}}" style="display: none;">
                                 <form method="POST" action="{% url 'newComment' family.id post.id %}">
                                     {% csrf_token %}
                                     <input type="text" name="content" style="width: 100%;" maxlength=400>
