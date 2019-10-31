@@ -1,0 +1,37 @@
+{% if is_paginated %}
+    <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.number > 2 %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page }}">1</a></li>
+                {% endif %}
+                {% for page in paginator.page_range %}
+                    {% if page == page_obj.number %}
+                        <li class="page-item active"><span class="page-link" href="#">{{ page }}<span class="sr-only"></span></span></li>
+                    {% elif page == page_obj.number|add:"-5" %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page }}">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Back5</span></a>
+                        </li>
+                    {% elif page == page_obj.number|add:"5" %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page }}">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Jump5</span></a>
+                        </li>
+                    {% elif page == page_obj.number|add:"-1" %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page }}">
+                            <span aria-hidden="true"><</span>
+                            <span class="sr-only">Previous</span></a>
+                        </li>
+                    {% elif page == page_obj.number|add:"1" %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page }}">
+                            <span aria-hidden="true">></span>
+                            <span class="sr-only">Next</span></a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.number != paginator.num_pages %}
+                    <li class="page-item"><a class="page-link" href="?page={{ paginator.num_pages }}">{{ paginator.num_pages }}</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+{% endif %}

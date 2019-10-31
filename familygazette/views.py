@@ -174,7 +174,7 @@ def create_post(request, familyId):
             new_post.compressImage()
 
             for member in selected_family.members.all().exclude(user=request.user) :
-                if member.newsletter and member.user.email :
+                if member.postNewsletter and member.user.email :
                     subject = 'Nouveau post pour la famille ' + selected_family.name
                     content = 'Nouveau post : \'{0}\' par {1}'.format(new_post.title, request.user.username)
                     context = {
@@ -202,7 +202,6 @@ def create_post(request, familyId):
 def update_post(request, postId):
     error = False
     posted = False
-    update = True
     post = get_object_or_404(Post, id=postId)
 
     if request.user.profile == post.user :
@@ -229,7 +228,8 @@ def update_post(request, postId):
         return render(request, 'new-post.html', {
             'form': form,
             'postId': postId,
-            'error': error
+            'error': error,
+            'update': True
         })
     else :
         return HttpResponseForbidden("Action Forbidden.")
@@ -260,7 +260,7 @@ def create_comment(request, familyId, postId):
         new_comment.post = selected_post
         new_comment.save()
         
-        if selected_post.user.user != request.user and selected_post.user.newsletter and selected_post.user.user.email :
+        if selected_post.user.user != request.user and selected_post.user.commentNewsletter and selected_post.user.user.email :
             subject = 'Nouveau commentaire de ' + request.user.username
             content = 'Nouveau commentaire sur votre photo \'{0}\''.format(selected_post.title)
             context = {
@@ -282,7 +282,7 @@ def create_comment(request, familyId, postId):
         if users_who_commented :
             messages = []
             for user in users_who_commented :
-                if user.newsletter and user.user.email :
+                if user.commentNewsletter and user.user.email :
                     subject = 'Nouveau commentaire de ' + request.user.username
                     content = '{0} a également commenté la photo \'{1}\''.format(request.user.username, selected_post.title)
                     context = {
@@ -419,7 +419,7 @@ class ListGazettes(LoginRequiredMixin, ListView):
     model = Gazette
     context_object_name = "gazettes"
     template_name = "gazettes.html"
-    paginate_by = 5 # attribut de pagination
+    #paginate_by = 5 # attribut de pagination
 
     def get_queryset(self):
         return Gazette.objects.filter(family__id=self.kwargs['familyId'])

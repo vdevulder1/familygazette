@@ -23,6 +23,14 @@
                     <div class="row">
                         <div class="input-group flex-nowrap col">
                             <div class="input-group-prepend">
+                                <span class="input-group-text" id="addon-wrapping">Date de naissance</span>
+                            </div>
+                            <input type="text" class="form-control" value="{{profile.birthday}}" aria-label="birthday" aria-describedby="addon-wrapping" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-group flex-nowrap col">
+                            <div class="input-group-prepend">
                                 <span class="input-group-text" id="addon-wrapping">@ Email</span>
                             </div>
                             <input type="text" class="form-control" placeholder="Email" value="{{profile.user.email}}" aria-label="Email" aria-describedby="addon-wrapping" readonly>
@@ -30,9 +38,25 @@
                     </div>
                     <div class="row">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" checked="{{profile.newsletter}}" id="defaultCheck2" disabled>
+                            <input class="form-check-input" type="checkbox" value="" checked="{{profile.generalNewsletter}}" id="defaultCheck2" disabled>
                             <label class="form-check-label" for="defaultCheck2">
                                 Abonné(e) à la newsletter
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" checked="{{profile.postNewsletter}}" id="defaultCheck2" disabled>
+                            <label class="form-check-label" for="defaultCheck2">
+                                Suivi par mail des nouveaux posts
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" checked="{{profile.commentNewsletter}}" id="defaultCheck2" disabled>
+                            <label class="form-check-label" for="defaultCheck2">
+                                Suivi par mail des nouveaux commentaires
                             </label>
                         </div>
                     </div>

@@ -14,7 +14,10 @@ class UserForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ('avatar', 'newsletter')
+        fields = ('avatar', 'birthday', 'generalNewsletter', 'postNewsletter', 'commentNewsletter')
+        widgets = {
+            'birthday': forms.SelectDateWidget(years=range(1950,2010))
+        }
 
 class FamilyForm(forms.ModelForm):
     class Meta:
@@ -24,7 +27,7 @@ class FamilyForm(forms.ModelForm):
 class PostForm(forms.Form):
     title = forms.CharField(label="Titre", max_length=100)
     photo = forms.ImageField()
-    families = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple, label="Famille(s) avec qui partager ce post")
+    families = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple, label="Famille(s) avec qui partager ce post", required=True)
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)

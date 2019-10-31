@@ -2,9 +2,9 @@ from django.contrib import admin
 from .models import Family, Post, Comment, Profile, Suggestion, Gazette
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'newsletter')
+    list_display = ('user', 'birthday', 'generalNewsletter', 'postNewsletter', 'commentNewsletter')
     ordering = ('user',)
-    list_filter = ('newsletter',)
+    list_filter = ('generalNewsletter', 'postNewsletter', 'commentNewsletter')
 
 class FamilyAdmin(admin.ModelAdmin):
     list_display = ('name', 'creation_date')
