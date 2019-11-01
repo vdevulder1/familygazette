@@ -40,7 +40,6 @@ class UpdatePostForm(forms.ModelForm):
         model = Post
         fields = ('title', 'photo')
 
-
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
@@ -50,3 +49,7 @@ class SuggestionForm(forms.ModelForm):
     class Meta:
         model = Suggestion
         fields = ('content',)
+
+class MailForm(forms.Form):
+    subject = forms.CharField(label="Sujet", max_length=50, required=True)
+    content = forms.CharField(label="Contenu", required=True)

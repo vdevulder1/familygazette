@@ -54,11 +54,13 @@ urlpatterns = [
     path('suggestions', views.ListSuggestions.as_view(), name='suggestions'),
     path('suggestions/new-suggestion', views.create_suggestion, name="newSuggestion"),
     path('suggestions/<int:suggestionId>/like', views.like_suggestion, name="likeSuggestion"),
-    path('family/<int:familyId>/generate-document', views.generate_gazette),
+    path('family/<int:familyId>/generate-document', views.generate_gazette, name="generateDocument"),
     path('family/<int:familyId>/gazettes', views.ListGazettes.as_view(), name='gazettes'),
     path('family/download/<int:gazetteId>', views.download_gazette, name='downloadGazette'),
     path('family/<int:familyId>/members', views.ListMembers.as_view(), name='members'),
     path('<str:model>/<int:modelId>/rotate/<int:rotation>', views.rotate_img, name="rotate"),
+    path('messages', views.messages, name='messages'),
+    path('messages/new-mail', views.new_mail, name='newMail'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

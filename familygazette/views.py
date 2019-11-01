@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.views.generic import ListView, DeleteView
 from django.contrib.auth.decorators import login_required
 from .models import Family, Post, Comment, Profile, Suggestion, Gazette
-from .forms import LoginForm, UserForm, ProfileForm, PostForm, UpdatePostForm, CommentForm, SuggestionForm
+from .forms import LoginForm, UserForm, ProfileForm, PostForm, UpdatePostForm, CommentForm, SuggestionForm, MailForm
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
@@ -405,14 +405,18 @@ def generate_gazette(request, familyId):
     font_style = xlwt.XFStyle()
 
     rows = []
-    column = ['title', 'user', 'filename']
+    column = ['title', 'user', 'avatar', 'filename']
     files = []
+    avatars = []
     #column.append('family')
     #row.append(family.name)
-    for num,post in enumerate(posts) :
+    for num,post in enumerate(posts):
         file_name = post.photo.path.split('/')[-1]
-        rows.append([post.title, '{0} {1}'.format(post.user.user.first_name, post.user.user.last_name), file_name])
+        avatar_path = post.user.avatar.path.split('/')[-1]
+        rows.append([post.title, '{0} {1}'.format(post.user.user.first_name, post.user.user.last_name), avatar_path, file_name])
         files.append(file_name)
+        if avatar_path not in avatars:
+            avatars.append(avatar_path)
 
     for col_num in range(len(column)):
         ws.write(row_num, col_num, column[col_num], font_style) # at 0 row 0 column 
@@ -422,17 +426,19 @@ def generate_gazette(request, familyId):
         for col_num in range(len(row)):
             ws.write(row_num, col_num, row[col_num], font_style)
 
-    wb.save('media/photos/familygazetteExcel.xls')
+    wb.save('media/familygazetteExcel.xls')
 
     response = HttpResponse(content_type='application/zip')
     zf = zipfile.ZipFile(response, 'w')
-    zf.write('media/photos/familygazetteExcel.xls')
+    zf.write('media/familygazetteExcel.xls')
     for filename in files:
-        zf.write(os.path.join('media/photos', filename)) 
+        zf.write(os.path.join('media/photos', filename))
+    for filename in avatars:
+        zf.write(os.path.join('media/avatars', filename))
 
     response['Content-Disposition'] = 'attachment; filename=familygazette_{}.zip'.format(family.name)
 
-    os.remove("media/photos/familygazetteExcel.xls")
+    os.remove("media/familygazetteExcel.xls")
     
     return response
 
@@ -491,3 +497,34 @@ def rotate_img(request, model, modelId, rotation):
         return redirect('updateProfile')
     else : 
         return redirect('update{0}'.format(model.capitalize()), modelId)
+
+@staff_member_required
+def messages(request):
+
+    return render(request, 'messages.html')
+
+@staff_member_required
+@require_POST
+def new_mail(request):
+
+    form = MailForm(request.POST)
+    if form.is_valid():
+        subject = form.cleaned_data['subject']
+        content = form.cleaned_data['content']
+        context = {
+            'subject': subject,
+            'content': content,
+            'url': 'home'
+        }
+        html_message = render_to_string('mail.html', context)
+        plain_message = strip_tags(html_message)
+        mail.send_mail(
+            subject,
+            plain_message,
+            settings.EMAIL_HOST_USER,
+            [Profile.objects.get(user__username='vdevulder').user.email],
+            html_message=html_message
+        )
+        return redirect('messages')
+    else:
+        return redirect('messages')
