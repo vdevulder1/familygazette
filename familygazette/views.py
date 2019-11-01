@@ -412,10 +412,13 @@ def generate_gazette(request, familyId):
     #row.append(family.name)
     for num,post in enumerate(posts):
         file_name = post.photo.path.split('/')[-1]
-        avatar_path = post.user.avatar.path.split('/')[-1]
+        if post.user.avatar:
+            avatar_path = post.user.avatar.path.split('/')[-1]
+        else:
+            avatar_path = None
         rows.append([post.title, '{0} {1}'.format(post.user.user.first_name, post.user.user.last_name), avatar_path, file_name])
         files.append(file_name)
-        if avatar_path not in avatars:
+        if avatar_path and avatar_path not in avatars:
             avatars.append(avatar_path)
 
     for col_num in range(len(column)):
