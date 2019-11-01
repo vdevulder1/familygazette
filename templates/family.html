@@ -5,6 +5,9 @@
         <h5><strong>{{ family.name }}</strong></h5>
         Dernières actualités
         <button id="newPostButton" class="btn  btn-success" onclick="document.location.href='{% url 'newPost' family.id %}';"><i class="far fa-plus-square"></i> Créer un nouveau post</button>
+        {% if user.is_staff %}
+            <button class="btn btn-secondary" onclick="document.location.href='{% url 'generateDocument' family.id %}';">Générer la gazette</button>
+        {% endif %}
     </div>
     <div class="card-body">
         {% if posts %}
@@ -29,27 +32,27 @@
                                 <a href="{% url 'updatePost' post.id %}"><button class="btn btn-info" type="button"><i class='fas fa-edit'></i> Modifier</button></a>
                                 <button class="btn btn-sm btn-outline-danger" type="button" data-toggle="modal" data-target="#modalPost{{post.id}}"><i class="fas fa-trash-alt"></i> Supprimer</button>
                                 <div class="modal fade" id="modalPost{{post.id}}" tabindex="-1" role="dialog" aria-labelledby="modalPost{{post.id}}Label" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="modalPost{{post.id}}Label">Confirmation</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                Voulez-vous vraiment supprimer le post '{{post.title}}' ?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-                                                <form method="POST">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-danger" formaction="{% url 'deletePost' post.id %}">Supprimer</button>
-                                                </form>
-                                            </div>
-                                            </div>
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalPost{{post.id}}Label">Confirmation</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Voulez-vous vraiment supprimer le post '{{post.title}}' ?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                            <form method="POST">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger" formaction="{% url 'deletePost' post.id %}">Supprimer</button>
+                                            </form>
+                                        </div>
                                         </div>
                                     </div>
+                                </div>
                             </div>
                         {% endif %}
                     </div>
