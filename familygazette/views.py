@@ -513,7 +513,7 @@ def new_mail(request):
     form = MailForm(request.POST)
     if form.is_valid():
         subject = form.cleaned_data['subject']
-        content = form.cleaned_data['content']
+        content = form.cleaned_data['content'].split('\n')
         context = {
             'subject': subject,
             'content': content,
