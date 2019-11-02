@@ -147,3 +147,41 @@ class Gazette(models.Model):
 
     def __str__(self):
         return "Gazette of {0} from the {1}".format(self.family, self.date)
+
+class Conversation(models.Model):
+    users = models.ManyToManyField(Profile)
+    last_message = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return '-'.join(map(lambda x: x.__str__(), self.users.all()))
+    
+    class Meta:
+        ordering = ['-last_message']
+
+    @property
+    def messages(self):
+        """
+        Permet de récupérer l'ensemble des messages d'une conversation
+        """
+        return self.message_set.all()
+
+    @property
+    def unseen_messages_count(self, user):
+        """
+        Retourne le nombre de messages non lus par un user
+        """
+        return self.message_set.exclude(seenBy__contains=user).count()
+
+
+class Message(models.Model):
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
+    date = models.DateTimeField(default=timezone.now)
+    sender = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    seenBy = models.ManyToManyField(Profile, related_name='seenBy_users')
+    content = models.TextField()
+
+    def __str__(self):
+        return "{0} - {1}".format(self.date, self.sender)
+
+    class Meta:
+        ordering = ['date']

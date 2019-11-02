@@ -5,12 +5,12 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import reverse
 from django.views.generic import ListView, DeleteView
 from django.contrib.auth.decorators import login_required
-from .models import Family, Post, Comment, Profile, Suggestion, Gazette
-from .forms import LoginForm, UserForm, ProfileForm, PostForm, UpdatePostForm, CommentForm, SuggestionForm, MailForm
+from .models import Family, Post, Comment, Profile, Suggestion, Gazette, Conversation, Message
+from .forms import LoginForm, UserForm, ProfileForm, PostForm, UpdatePostForm, CommentForm, SuggestionForm, MailForm, ConversationForm, MessageForm
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
-from django.core import mail
+from django.core import mail, serializers
 from django.template.loader import render_to_string, get_template
 from django.template import RequestContext
 from django.utils.html import strip_tags
@@ -506,10 +506,38 @@ def rotate_img(request, model, modelId, rotation):
     else : 
         return redirect('update{0}'.format(model.capitalize()), modelId)
 
-@staff_member_required
+@login_required
 def messages(request):
 
-    return render(request, 'messages.html')
+    conversations = Conversation.objects.filter(users=request.user.profile)
+    users = Profile.objects.filter(family__in=request.user.profile.families).distinct().exclude(user=request.user)
+
+    return render(request, 'messages.html', {
+        'conversations': conversations,
+        'users': users
+    })
+
+@login_required
+@require_POST
+def new_conversation(request):
+
+    conversation_form = ConversationForm(request.POST, user=request.user.profile)
+    message_form = MessageForm(request.POST)
+    if conversation_form.is_valid() and message_form.is_valid():
+        conversation = Conversation.objects.create()
+        for conversation_user in conversation_form.cleaned_data['users']:
+            conversation.users.add(conversation_user)
+        conversation.users.add(request.user.profile)
+        message = Message()
+        message.content = message_form.cleaned_data['content']
+        message.sender = request.user.profile
+        message.conversation = conversation
+        message.save()
+        message.seenBy.add(request.user.profile)
+
+        return redirect('messages')
+    else:
+        return redirect('messages')
 
 @staff_member_required
 @require_POST
@@ -540,3 +568,30 @@ def new_mail(request):
         return redirect('messages')
     else:
         return redirect('messages')
+
+@login_required
+@require_GET
+def get_messages(request, conversationId):
+    messages = Conversation.objects.get(id=conversationId).messages
+    data = serializers.serialize('json', messages)
+    for message in messages :
+        message.seenBy.add(request.user.profile)
+    return HttpResponse(data, content_type='application/json')
+
+@login_required
+@require_POST
+def new_message(request, conversationId):
+    message_form = MessageForm(request.POST)
+    if message_form.is_valid():
+        message = Message()
+        message.content = message_form.cleaned_data['content']
+        message.sender = request.user.profile
+        message.conversation = get_object_or_404(Conversation, id=conversationId)
+        message.save()
+        message.seenBy.add(request.user.profile)
+        messages = Conversation.objects.get(id=conversationId).messages
+        data = serializers.serialize('json', messages)
+
+        return HttpResponse(data, content_type='application/json')
+    else:
+        handler500(request)

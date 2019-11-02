@@ -32,7 +32,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login', views.logIn, name="login"),
     path('logout', views.logOut, name="logout"),
-    re_path(r'^media', views.accessMedia),
+    #re_path(r'^media', views.accessMedia),
     path('password/change/', auth_views.PasswordChangeView.as_view(), name="password_change"),
     path('password/change/done/', auth_views.PasswordChangeDoneView.as_view(), name="password_change_done"),
     path('password/reset/', auth_views.PasswordResetView.as_view(), name="password_reset"),
@@ -61,6 +61,9 @@ urlpatterns = [
     path('<str:model>/<int:modelId>/rotate/<int:rotation>', views.rotate_img, name="rotate"),
     path('messages', views.messages, name='messages'),
     path('messages/new-mail', views.new_mail, name='newMail'),
+    path('messages/new-conversation', views.new_conversation, name='newConversation'),
+    path('messages/<int:conversationId>', views.get_messages, name='getMessages'),
+    path('messages/<int:conversationId>/new-message', views.new_message, name='newMessage'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

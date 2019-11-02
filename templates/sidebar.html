@@ -21,9 +21,7 @@
                     </div>
                </button>
                {% endfor %}
-               {% if user.is_staff %}
                <a href="{% url 'messages' %}" class="list-group-item list-group-item-action bg-dark text-white">Messages</a>
-               {% endif %}
                <a href="{% url 'suggestions' %}" class="list-group-item list-group-item-action bg-dark text-white">Suggestions</a>
           </div>
      </div>

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Family, Post, Comment, Profile, Suggestion, Gazette
+from .models import Family, Post, Comment, Profile, Suggestion, Gazette, Message
 
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'birthday', 'generalNewsletter', 'postNewsletter', 'commentNewsletter')
@@ -33,9 +33,16 @@ class GazetteAdmin(admin.ModelAdmin):
     list_filter = ('family',)
     ordering = ('-date',)
 
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ('date', 'sender', 'conversation')
+    list_filter = ('sender', 'conversation')
+    ordering = ('-date',)
+    search_fields = ('sender', 'conversation')
+
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Family, FamilyAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Suggestion, SuggestionAdmin)
 admin.site.register(Gazette, GazetteAdmin)
+admin.site.register(Message, MessageAdmin)
