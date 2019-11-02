@@ -406,7 +406,7 @@ def generate_gazette(request, familyId):
     font_style = xlwt.XFStyle()
 
     rows = []
-    column = ['title', 'user', 'avatar', 'filename']
+    column = ['title', 'date', 'user', 'avatar', 'filename']
     files = []
     avatars = []
     #column.append('family')
@@ -417,7 +417,7 @@ def generate_gazette(request, familyId):
             avatar_path = post.user.avatar.path.split('/')[-1]
         else:
             avatar_path = None
-        rows.append([post.title, '{0} {1}'.format(post.user.user.first_name, post.user.user.last_name), avatar_path, file_name])
+        rows.append([post.title, post.event_date.strftime("%d/%m/%y"), '{0} {1}'.format(post.user.user.first_name, post.user.user.last_name), avatar_path, file_name])
         files.append(file_name)
         if avatar_path and avatar_path not in avatars:
             avatars.append(avatar_path)
