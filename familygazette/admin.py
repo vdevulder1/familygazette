@@ -12,11 +12,11 @@ class FamilyAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'date', 'user')
+    list_display = ('title', 'user', 'publication_date', 'event_date')
     list_filter = ('user', 'family')
-    date_hierarchy = 'date'
-    ordering = ('date', )
-    search_fields = ('title', 'date')
+    date_hierarchy = 'publication_date'
+    ordering = ('publication_date', 'event_date')
+    search_fields = ('title', 'user', 'event_date')
 
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('post', 'date', 'user')

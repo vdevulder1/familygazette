@@ -21,7 +21,7 @@
                     <div class="post_header">
                         <div class="card-text user_container">
                             <span class="user_name">
-                                <small class="text-muted">{{ post.date }} by </small><strong>{{post.user}}</strong>
+                                <small class="text-muted">Publié le {{ post.publication_date }} par </small><strong>{{post.user}}</strong>
                             </span>
                             {% if post.user.avatar %}
                                 <img src="{{ post.user.avatar.url }}" alt="Avatar" class="avatar avatarPost">

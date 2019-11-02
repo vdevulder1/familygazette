@@ -2,6 +2,7 @@ import sys
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from datetime import date
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from PIL import Image
@@ -74,12 +75,13 @@ class Family(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=100)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    date = models.DateTimeField(default=timezone.now, verbose_name="Date de publication")
+    publication_date = models.DateTimeField(default=timezone.now, verbose_name="Date de publication")
+    event_date = models.DateField(auto_now=False, auto_now_add=False, default=date.today, verbose_name="Date de l'évènement")
     family = models.ForeignKey(Family, on_delete=models.CASCADE, verbose_name="Famille")
     photo = models.ImageField(upload_to="photos/")
 
     class Meta:
-        ordering = ['-date']
+        ordering = ['-publication_date']
 
     def __str__(self):
         return self.title
