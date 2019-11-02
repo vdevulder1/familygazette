@@ -521,7 +521,7 @@ def new_mail(request):
         }
         html_message = render_to_string('mail.html', context)
         plain_message = strip_tags(html_message)
-        for family in Family.objects.all()
+        for family in Family.objects.all() :
             for member in family.members.all().exclude(user=request.user) :
                     if member.generalNewsletter and member.user.email :
                         mail.send_mail(
