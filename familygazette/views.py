@@ -166,6 +166,7 @@ def create_post(request, familyId):
             selected_family = get_object_or_404(Family, id=family.id)
             new_post = Post()
             new_post.title = form.cleaned_data['title']
+            new_post.event_date = form.cleaned_data['event_date']
             new_post.photo = uploaded_photo
             new_post.user = request.user.profile
             new_post.family = selected_family
@@ -389,7 +390,7 @@ def like_suggestion(request, suggestionId):
 
 @staff_member_required
 def generate_gazette(request, familyId):
-    posts = Post.objects.filter(family__id=familyId)
+    posts = Post.objects.filter(family__id=familyId).order_by('event_date')
     family = get_object_or_404(Family, id=familyId)
 
     wb = xlwt.Workbook(encoding='utf-8')

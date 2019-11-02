@@ -27,6 +27,7 @@ class FamilyForm(forms.ModelForm):
 class PostForm(forms.Form):
     title = forms.CharField(label="Titre", max_length=100)
     photo = forms.ImageField()
+    event_date = forms.DateField(widget=forms.SelectDateWidget, label="Date de l'évènement")
     families = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple, label="Famille(s) avec qui partager ce post", required=True)
 
     def __init__(self, *args, **kwargs):
@@ -38,7 +39,10 @@ class PostForm(forms.Form):
 class UpdatePostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ('title', 'photo')
+        fields = ('title', 'photo', 'event_date')
+        widgets = {
+            'event_date': forms.SelectDateWidget()
+        }
 
 class CommentForm(forms.ModelForm):
     class Meta:
