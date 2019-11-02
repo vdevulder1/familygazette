@@ -181,7 +181,8 @@ def create_post(request, familyId):
                     context = {
                         'subject': subject,
                         'content': content,
-                        'url': 'family/' + str(selected_family.id)
+                        'url': 'family/' + str(selected_family.id),
+                        'fromForm': False
                     }
                     html_message = render_to_string('mail.html', context)
                     plain_message = strip_tags(html_message)
@@ -269,7 +270,8 @@ def create_comment(request, familyId, postId):
             context = {
                 'subject': subject,
                 'content': content,
-                'url': 'family/' + str(selected_post.family.id)
+                'url': 'family/' + str(selected_post.family.id),
+                'fromForm': False
             }
             html_message = render_to_string('mail.html', context)
             plain_message = strip_tags(html_message)
@@ -291,7 +293,8 @@ def create_comment(request, familyId, postId):
                     context = {
                         'subject': subject,
                         'content': content,
-                        'url': 'family/' + str(selected_post.family.id)
+                        'url': 'family/' + str(selected_post.family.id),
+                        'fromForm': False
                     }
                     html_message = render_to_string('mail.html', context)
                     plain_message = strip_tags(html_message)
@@ -360,7 +363,8 @@ def create_suggestion(request):
         context = {
             'subject': subject,
             'content': content,
-            'url': 'suggestions'
+            'url': 'suggestions',
+            'fromForm': False
         }
         html_message = render_to_string('mail.html', context)
         plain_message = strip_tags(html_message)
@@ -518,7 +522,8 @@ def new_mail(request):
         context = {
             'subject': subject,
             'content': content,
-            'url': 'home'
+            'url': 'home',
+            'fromForm': True
         }
         html_message = render_to_string('mail.html', context)
         plain_message = strip_tags(html_message)
