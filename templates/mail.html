@@ -67,9 +67,13 @@
 	 	<h3>{{ subject }}</h3>
             </div>
             <div class="card-body text-center">
-		{% for line in content %}
-		    {{ line }}<br>
-		{% endfor %}
+				{% if fromForm %}
+					{% for line in content %}
+						{{ line }}<br>
+					{% endfor %}
+				{% else %}
+					{{ content }}
+				{% endif %}
             </div>
 	    <a href="https://www.familygazette.fr/home">
             <div class="card-footer">
