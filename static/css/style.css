@@ -218,12 +218,20 @@ li.member {
   background-color: #d6f5d6 !important;
 }
 
-.receivedMessage {
+.multiUsers {
+  margin-top: 10px;
+  margin-bottom: 0px;
 }
 
 .scrollable {
   overflow: auto;
   max-height: 70vh;
+}
+
+.badge {
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: auto;
 }
 
 @media (min-width: 768px) {
@@ -240,9 +248,6 @@ li.member {
     margin-left: -15rem;
   }
 
-  #conversationsCard {
-    max-width: 25%;
-  }
 }
 
 @media (max-width: 768px) {
@@ -293,7 +298,21 @@ li.member {
     margin-left: 0px;
     margin-right: 0px;
   }
+}
 
+@media (min-width: 690px) {
+  #conversationsCard {
+    max-width: 25%;
+  }
+}
+
+@media (max-width: 690px) {
+  #conversationsCard {
+    max-width: 30%;
+  }
+}
+
+@media (max-width: 576px) {
   #conversationsCard {
     max-width: 100%;
   }

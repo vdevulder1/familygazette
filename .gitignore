@@ -2,6 +2,7 @@ familygazette/settings.py
 familygazette/wsgi.py
 familygazette/__pycache__/*
 familygazette/migrations/*
+familygazette/templatetags/__pycache__/*
 static/photos/*
 media
 familygazette_env

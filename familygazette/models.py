@@ -50,6 +50,13 @@ class Profile(models.Model):
         Permet de récupérer l'ensemble des familles auquel appartient le User
         """
         return self.family_set.all()
+
+    def unseenMessages(user):
+        unreadMessages = 0
+        for conversation in Conversation.objects.filter(users__id=user.id):
+            unreadMessages += conversation.unseen_messages_count(user)
+
+        return unreadMessages
     
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -165,12 +172,11 @@ class Conversation(models.Model):
         """
         return self.message_set.all()
 
-    @property
     def unseen_messages_count(self, user):
         """
         Retourne le nombre de messages non lus par un user
         """
-        return self.message_set.exclude(seenBy__contains=user).count()
+        return self.message_set.exclude(seenBy__id=user.id).count()
 
 
 class Message(models.Model):

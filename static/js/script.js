@@ -104,11 +104,22 @@ function addSuggestion() {
 function clearAndFillMessages(data, idUser) {
     $('#messagesCard').empty();
     $('#newMessageContent').val('');
-    data.forEach(element => {
+    let multiUsers = '';
+    let multi = false;
+    if (Object.keys(data.users).length > 2) {
+        multiUsers = 'multiUsers';
+        multi = true;
+    }
+
+    $.each(JSON.parse(data.messages), function(index, element) {
+        let username = '';
+        if (multi) {
+            username = `<span class='text-muted'><small>@${data.users[element.fields.sender]}</small></span>`;
+        }
         if(element.fields.sender == idUser) {
             $('#messagesCard').append(`<div class='row justify-content-end' style='margin: 0px;'><div class='card message sentMessage' id='message${element.pk}' data-toggle='tooltip' title='${element.fields.date}'>${element.fields.content}</div></div>`);
         } else {
-            $('#messagesCard').append(`<div class='row justify-content-start' style='margin: 0px;'><div class='card message receivedMessage' data-toggle='tooltip' title='${element.fields.date}'>${element.fields.content}</div></div>`);
+            $('#messagesCard').append(`<div class='row justify-content-start' style='margin: 0px;'><div class='col'><div class='card message ${multiUsers}' data-toggle='tooltip' title='${element.fields.date}'>${element.fields.content}</div>${username}</div></div>`);
         } 
     });
     var objDiv = $("#scrollableMessages");
@@ -126,4 +137,14 @@ function getMessages(idConversation, idUser) {
     $('#newMessageForm').attr('action', `/messages/${idConversation}/new-message`);
     $('#newMessageContent').prop('disabled', false);
     $('#newMessageButton').prop('disabled', false);
+    remainingMessages = parseInt($('#notifsSidebar').text());
+    if (remainingMessages) {
+        remainingMessages = remainingMessages - parseInt($(`#notifsConv${idConversation}`).text());
+        $(`#notifsConv${idConversation}`).empty();
+        if (remainingMessages == 0) {
+            $('#notifsSidebar').empty();
+        } else {
+            $('#notifsSidebar').text(remainingMessages);
+        }
+    }
 }

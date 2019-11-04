@@ -14,11 +14,13 @@ from django.core import mail, serializers
 from django.template.loader import render_to_string, get_template
 from django.template import RequestContext
 from django.utils.html import strip_tags
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponseServerError
 from django.conf import settings
 import xlwt, zipfile, os
 from django.core.files.storage import FileSystemStorage
 from PIL import Image
+from django.db.models import Count
+import json
 
 def handler400(request, exception):
     statusCode = 400
@@ -524,10 +526,37 @@ def new_conversation(request):
     conversation_form = ConversationForm(request.POST, user=request.user.profile)
     message_form = MessageForm(request.POST)
     if conversation_form.is_valid() and message_form.is_valid():
-        conversation = Conversation.objects.create()
-        for conversation_user in conversation_form.cleaned_data['users']:
-            conversation.users.add(conversation_user)
-        conversation.users.add(request.user.profile)
+        conversation_users = conversation_form.cleaned_data['users']
+        query = Conversation.objects.annotate(count=Count('users')).filter(count=(len(conversation_users)+1)).filter(users__id=request.user.profile.id)
+        for user in conversation_users :
+            query = query.filter(users__id=user.id)
+        if not query.exists() :
+            conversation = Conversation.objects.create()
+            for conversation_user in conversation_users :
+                conversation.users.add(conversation_user)
+            conversation.users.add(request.user.profile)
+            for user in conversation_users :
+                if user.commentNewsletter and user.user.email :
+                    subject = 'Nouveau message'
+                    content = '{0} vous a envoyé un nouveau message !'.format(request.user.username)
+                    context = {
+                        'subject': subject,
+                        'content': content,
+                        'url': 'messages',
+                        'fromForm': False
+                    }
+                    html_message = render_to_string('mail.html', context)
+                    plain_message = strip_tags(html_message)
+                    mail.send_mail(
+                        subject,
+                        plain_message,
+                        settings.EMAIL_HOST_USER,
+                        [user.user.email],
+                        html_message=html_message
+                    )
+
+        else :
+            conversation = query[0]
         message = Message()
         message.content = message_form.cleaned_data['content']
         message.sender = request.user.profile
@@ -572,26 +601,48 @@ def new_mail(request):
 @login_required
 @require_GET
 def get_messages(request, conversationId):
-    messages = Conversation.objects.get(id=conversationId).messages
-    data = serializers.serialize('json', messages)
-    for message in messages :
-        message.seenBy.add(request.user.profile)
-    return HttpResponse(data, content_type='application/json')
+
+    conversation = get_object_or_404(Conversation, id=conversationId)
+    if request.user.profile in conversation.users.all() :
+        pre_messages = conversation.messages
+        messages = serializers.serialize('json', pre_messages)
+        users = {}
+        for user in conversation.users.all():
+            users[user.id] = user.user.username
+        data = {}
+        data['messages'] = messages
+        data['users'] = users
+        for message in pre_messages :
+            message.seenBy.add(request.user.profile)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    else:
+        return HttpResponseForbidden("Action Forbidden.")
 
 @login_required
 @require_POST
 def new_message(request, conversationId):
-    message_form = MessageForm(request.POST)
-    if message_form.is_valid():
-        message = Message()
-        message.content = message_form.cleaned_data['content']
-        message.sender = request.user.profile
-        message.conversation = get_object_or_404(Conversation, id=conversationId)
-        message.save()
-        message.seenBy.add(request.user.profile)
-        messages = Conversation.objects.get(id=conversationId).messages
-        data = serializers.serialize('json', messages)
 
-        return HttpResponse(data, content_type='application/json')
+    conversation = get_object_or_404(Conversation, id=conversationId)
+    if request.user.profile in conversation.users.all() :
+        message_form = MessageForm(request.POST)
+        if message_form.is_valid():
+            message = Message()
+            message.content = message_form.cleaned_data['content']
+            message.sender = request.user.profile
+            message.conversation = get_object_or_404(Conversation, id=conversationId)
+            message.save()
+            message.seenBy.add(request.user.profile)
+            pre_messages = Conversation.objects.get(id=conversationId).messages
+            messages = serializers.serialize('json', pre_messages)
+            users = {}
+            for user in conversation.users.all():
+                users[user.id] = user.user.username
+            data = {}
+            data['messages'] = messages
+            data['users'] = users
+
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        else:
+            return HttpResponseServerError('Form not valid')
     else:
-        handler500(request)
+        return HttpResponseForbidden("Action Forbidden.")

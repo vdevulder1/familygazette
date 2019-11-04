@@ -1,5 +1,6 @@
 {% extends "index.html" %}
 {% block content %}
+{% load extras_tags %}
     
     <div class="card-header">
         <h5><strong>Messages</strong></h5>
@@ -85,9 +86,12 @@
                                         {% if conversation.users.all.count == 2 and conv_user.avatar %}
                                             <img src="{{ conv_user.avatar.url }}" alt="Avatar" class="avatar avatarConversation">
                                         {% endif %}
-                                        <span class="user_name">{{conv_user}}</span>
+                                        <span class="user_name">@{{conv_user}}</span>
                                     {% endif %}
                                 {% endfor %}
+                                {% autoescape off %}
+                                    {% unseen_messages_conv conversation user.profile %}
+                                {% endautoescape %}
                             </button>
                         {% endfor %}
                     {% else %}
