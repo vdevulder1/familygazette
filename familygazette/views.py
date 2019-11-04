@@ -563,6 +563,7 @@ def new_conversation(request):
         message.conversation = conversation
         message.save()
         message.seenBy.add(request.user.profile)
+        Conversation.objects.filter(id=conversation.id).update(last_message=message.date)
 
         return redirect('messages')
     else:
@@ -629,9 +630,10 @@ def new_message(request, conversationId):
             message = Message()
             message.content = message_form.cleaned_data['content']
             message.sender = request.user.profile
-            message.conversation = get_object_or_404(Conversation, id=conversationId)
+            message.conversation = conversation
             message.save()
             message.seenBy.add(request.user.profile)
+            Conversation.objects.filter(id=conversationId).update(last_message=message.date)
             pre_messages = Conversation.objects.get(id=conversationId).messages
             messages = serializers.serialize('json', pre_messages)
             users = {}
