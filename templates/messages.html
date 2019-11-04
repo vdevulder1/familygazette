@@ -76,13 +76,16 @@
                 <div class="card-header">
                     <h6><strong>Conversations</strong></h6>
                 </div>
-                <div class="list-group">
+                <div class="list-group scrollable" role="tablist">
                     {% if conversations %}
                         {% for conversation in conversations%}
-                            <button type="button" class="list-group-item list-group-item-action" id="conversation{{conversation.id}}" onclick="getMessages({{conversation.id}}, {{user.profile.id}})">
+                            <button type="button" class="list-group-item list-group-item-action" id="conversation{{conversation.id}}" data-toggle="list" role="tab" style="display: inline-flex;" onclick="getMessages({{conversation.id}}, {{user.profile.id}})">
                                 {% for conv_user in conversation.users.all %}
                                     {% if conv_user != user.profile %}
-                                        {{conv_user}} 
+                                        {% if conversation.users.all.count == 2 and conv_user.avatar %}
+                                            <img src="{{ conv_user.avatar.url }}" alt="Avatar" class="avatar avatarConversation">
+                                        {% endif %}
+                                        <span class="user_name">{{conv_user}}</span>
                                     {% endif %}
                                 {% endfor %}
                             </button>
@@ -94,9 +97,9 @@
             </div>
             <div class="card" >
                 <div class="card-header" id="messagesHeader">
-
+                    <strong><div id="conversation_name"></div></strong>
                 </div>
-                <div class="card-body">
+                <div class="card-body scrollable" id="scrollableMessages" style="background-color: #f0f5f5;">
                     <div class="container" id="messagesCard">
                         <div class="text-muted text-center">Sélectionnez une conversation</div>
                     </div>

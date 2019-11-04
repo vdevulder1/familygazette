@@ -106,20 +106,21 @@ function clearAndFillMessages(data, idUser) {
     $('#newMessageContent').val('');
     data.forEach(element => {
         if(element.fields.sender == idUser) {
-            $('#messagesCard').append(`<div class='row justify-content-end' style='margin: 0px;'><div class='card text-right message sentMessage' id='message${element.pk}'>${element.fields.content}</div></div>`);
+            $('#messagesCard').append(`<div class='row justify-content-end' style='margin: 0px;'><div class='card message sentMessage' id='message${element.pk}' data-toggle='tooltip' title='${element.fields.date}'>${element.fields.content}</div></div>`);
         } else {
-            $('#messagesCard').append(`<div class='row justify-content-start' style='margin: 0px;'><div class='card text-left message receivedMessage'>${element.fields.content}</div></div>`);
+            $('#messagesCard').append(`<div class='row justify-content-start' style='margin: 0px;'><div class='card message receivedMessage' data-toggle='tooltip' title='${element.fields.date}'>${element.fields.content}</div></div>`);
         } 
     });
+    var objDiv = $("#scrollableMessages");
+    objDiv.scrollTop(objDiv.height());
 }
 
 function getMessages(idConversation, idUser) {
-    $('#messagesHeader').empty();
     $.ajax({url: `messages/${idConversation}`,
     success: function(result){
         clearAndFillMessages(result, idUser);
         var convName = $(`#conversation${idConversation}`).text();
-        $('#messagesHeader').append(`<div>${convName}</div>`);
+        $('#conversation_name').text(convName);
     }});
 
     $('#newMessageForm').attr('action', `/messages/${idConversation}/new-message`);

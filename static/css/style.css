@@ -129,6 +129,13 @@ img {
   margin-bottom: 10px;
 }
 
+.avatarConversation {
+  width: 50px;
+  height: 50px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
 .avatarComment {
   width: 30px;
   height: 30px;
@@ -204,13 +211,19 @@ li.member {
   max-width: 90%;
   border-radius: 15px !important;
   margin-bottom: 5px;
+  border-width: 1px !important;
 }
 
 .sentMessage {
-  background-color: lightskyblue;
+  background-color: #d6f5d6 !important;
 }
 
 .receivedMessage {
+}
+
+.scrollable {
+  overflow: auto;
+  max-height: 70vh;
 }
 
 @media (min-width: 768px) {
