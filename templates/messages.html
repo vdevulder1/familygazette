@@ -1,8 +1,44 @@
 {% extends "index.html" %}
 {% block content %}
+{% load extras_tags %}
     
     <div class="card-header">
         <h5><strong>Messages</strong></h5>
+        <button class="btn btn-outline-info" type="button" data-toggle="modal" data-target="#modalNewConversation"><i class="fas fa-envelope"></i> Nouvelle conversation</button>
+        <div class="modal fade" id="modalNewConversation" tabindex="-1" role="dialog" aria-labelledby="modalNewConversationLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalNewConversationLabel">Nouvelle conversation</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form method="POST">
+                                {% csrf_token %}
+                            <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="users" class="col-form-label">Destinataires</label>
+                                        <select class="form-control" id="users" name="users" multiple>
+                                            {% for user in users %}
+                                                <option value="{{user.pk}}">{{user}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="content" class="col-form-label">Contenu</label>
+                                        <textarea class="form-control" id="content" name="content"></textarea>
+                                    </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>    
+                                <button type="submit" class="btn btn-success" formaction="{% url 'newConversation' %}">Envoyer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% if user.is_staff %}
         <button class="btn btn-outline-info" type="button" data-toggle="modal" data-target="#modalNewMail"><i class="fas fa-at"></i> Nouveau mail</button>
         <div class="modal fade" id="modalNewMail" tabindex="-1" role="dialog" aria-labelledby="modalNewMailLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -33,9 +69,54 @@
                 </div>
             </div>
         </div>
+        {% endif %}
     </div>
     <div class="card-body">
-        No messages so far.
+        <div class="card-group">
+            <div class="card" id="conversationsCard">
+                <div class="card-header">
+                    <h6><strong>Conversations</strong></h6>
+                </div>
+                <div class="list-group scrollable" role="tablist">
+                    {% if conversations %}
+                        {% for conversation in conversations%}
+                            <button type="button" class="list-group-item list-group-item-action" id="conversation{{conversation.id}}" data-toggle="list" role="tab" style="display: inline-flex;" onclick="getMessages({{conversation.id}}, {{user.profile.id}})">
+                                {% for conv_user in conversation.users.all %}
+                                    {% if conv_user != user.profile %}
+                                        {% if conversation.users.all.count == 2 and conv_user.avatar %}
+                                            <img src="{{ conv_user.avatar.url }}" alt="Avatar" class="avatar avatarConversation">
+                                        {% endif %}
+                                        <span class="user_name">@{{conv_user}}</span>
+                                    {% endif %}
+                                {% endfor %}
+                                {% autoescape off %}
+                                    {% unseen_messages_conv conversation user.profile %}
+                                {% endautoescape %}
+                            </button>
+                        {% endfor %}
+                    {% else %}
+                        <button class="list-group-item" disabled>Aucune conversation pour le moment</button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card" >
+                <div class="card-header" id="messagesHeader">
+                    <strong><div id="conversation_name"></div></strong>
+                </div>
+                <div class="card-body scrollable" id="scrollableMessages" style="background-color: #f0f5f5;">
+                    <div class="container" id="messagesCard">
+                        <div class="text-muted text-center">Sélectionnez une conversation</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <form id="newMessageForm" method="POST" action="" data-target="{{user.profile.id}}">
+                        {% csrf_token %}
+                        <input class="form-control" id="newMessageContent" name="content" style="width: 100%;" disabled>
+                        <button class="btn btn-success btnNewElement" id="newMessageButton" type="submit" disabled>Envoyer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     
 {% endblock %}

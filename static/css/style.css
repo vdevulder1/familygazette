@@ -129,6 +129,13 @@ img {
   margin-bottom: 10px;
 }
 
+.avatarConversation {
+  width: 50px;
+  height: 50px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
 .avatarComment {
   width: 30px;
   height: 30px;
@@ -194,6 +201,39 @@ li.member {
   box-shadow: 0 0 1em black;
 }
 
+#messagesCard {
+  height: 100%;
+}
+
+.message {
+  padding: 10px;
+  width: auto;
+  max-width: 90%;
+  border-radius: 15px !important;
+  margin-bottom: 5px;
+  border-width: 1px !important;
+}
+
+.sentMessage {
+  background-color: #d6f5d6 !important;
+}
+
+.multiUsers {
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
+
+.scrollable {
+  overflow: auto;
+  max-height: 70vh;
+}
+
+.badge {
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: auto;
+}
+
 @media (min-width: 768px) {
   #sidebar-wrapper {
     margin-left: 0;
@@ -207,6 +247,7 @@ li.member {
   #wrapper.toggled #sidebar-wrapper {
     margin-left: -15rem;
   }
+
 }
 
 @media (max-width: 768px) {
@@ -256,5 +297,23 @@ li.member {
   li.member {
     margin-left: 0px;
     margin-right: 0px;
+  }
+}
+
+@media (min-width: 690px) {
+  #conversationsCard {
+    max-width: 25%;
+  }
+}
+
+@media (max-width: 690px) {
+  #conversationsCard {
+    max-width: 30%;
+  }
+}
+
+@media (max-width: 576px) {
+  #conversationsCard {
+    max-width: 100%;
   }
 }

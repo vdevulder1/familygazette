@@ -61,6 +61,9 @@ urlpatterns = [
     path('<str:model>/<int:modelId>/rotate/<int:rotation>', views.rotate_img, name="rotate"),
     path('messages', views.messages, name='messages'),
     path('messages/new-mail', views.new_mail, name='newMail'),
+    path('messages/new-conversation', views.new_conversation, name='newConversation'),
+    path('messages/<int:conversationId>', views.get_messages, name='getMessages'),
+    path('messages/<int:conversationId>/new-message', views.new_message, name='newMessage'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

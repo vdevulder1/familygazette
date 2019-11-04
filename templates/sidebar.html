@@ -1,3 +1,4 @@
+{% load extras_tags %}
 {% if user.is_authenticated %}
      <div class="bg-dark text-white sidebar" id="sidebar-wrapper">
           <div class="sidebar-heading">Actions</div>
@@ -21,9 +22,10 @@
                     </div>
                </button>
                {% endfor %}
-               {% if user.is_staff %}
-               <a href="{% url 'messages' %}" class="list-group-item list-group-item-action bg-dark text-white">Messages</a>
-               {% endif %}
+               <a href="{% url 'messages' %}" class="list-group-item list-group-item-action bg-dark text-white">Messages 
+                    {% autoescape off %}
+                         {% unseen_messages_user user.profile %}
+                    {% endautoescape %}</a>
                <a href="{% url 'suggestions' %}" class="list-group-item list-group-item-action bg-dark text-white">Suggestions</a>
           </div>
      </div>

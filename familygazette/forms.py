@@ -57,3 +57,15 @@ class SuggestionForm(forms.ModelForm):
 class MailForm(forms.Form):
     subject = forms.CharField(label="Sujet", max_length=50, required=True)
     content = forms.CharField(label="Contenu", required=True)
+
+class ConversationForm(forms.Form):
+    users = forms.ModelMultipleChoiceField(queryset=None, required=True)
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(ConversationForm, self).__init__(*args, **kwargs)
+
+        self.fields['users'].queryset = Profile.objects.filter(family__in=user.families).distinct().exclude(user=user.user)
+
+class MessageForm(forms.Form):
+    content = forms.CharField(required=True)
