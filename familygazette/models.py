@@ -83,7 +83,7 @@ class Post(models.Model):
     title = models.CharField(max_length=100)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     publication_date = models.DateTimeField(default=timezone.now, verbose_name="Date de publication")
-    event_date = models.DateField(auto_now=False, auto_now_add=False, default=date.today, verbose_name="Date de l'évènement")
+    event_date = models.DateField(default=date.today, verbose_name="Date de l'évènement")
     family = models.ForeignKey(Family, on_delete=models.CASCADE, verbose_name="Famille")
     photo = models.ImageField(upload_to="photos/")
 

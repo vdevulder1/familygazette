@@ -1,6 +1,7 @@
 from django import forms
 from .models import Family, Profile, Comment, Post, Suggestion
 from django.contrib.auth.models import User
+from datetime import date
 
 class LoginForm(forms.Form):
     username = forms.CharField(label="Nom d'utilisateur", max_length=30)
@@ -27,7 +28,7 @@ class FamilyForm(forms.ModelForm):
 class PostForm(forms.Form):
     title = forms.CharField(label="Titre", max_length=100)
     photo = forms.ImageField()
-    event_date = forms.DateField(widget=forms.SelectDateWidget, label="Date de l'évènement")
+    event_date = forms.DateField(initial=date.today ,widget=forms.SelectDateWidget, label="Date de l'évènement")
     families = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple, label="Famille(s) avec qui partager ce post", required=True)
 
     def __init__(self, *args, **kwargs):
