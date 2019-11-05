@@ -16,7 +16,7 @@
                 <div class="image-container">
                     <img src="{{ post.photo.url }}" class="card-img-top">
                 </div>
-                <div class="card-body">
+                <div class="card-body" id="idPost{{post.id}}">
                     <h5 class="card-title">{{post.event_date}} - {{ post.title }}</h5>
                     <div class="post_header">
                         <div class="card-text user_container">
@@ -29,7 +29,7 @@
                         </div>
                         {% if post.user == user.profile %}
                             <div class="postButtons">
-                                <a href="{% url 'updatePost' post.id %}"><button class="btn btn-info" type="button"><i class='fas fa-edit'></i> Modifier</button></a>
+                                <a href="{% url 'updatePost' post.id %}?{{ request.GET.urlencode }}"><button class="btn btn-info" type="button"><i class='fas fa-edit'></i> Modifier</button></a>
                                 <button class="btn btn-sm btn-outline-danger" type="button" data-toggle="modal" data-target="#modalPost{{post.id}}"><i class="fas fa-trash-alt"></i> Supprimer</button>
                                 <div class="modal fade" id="modalPost{{post.id}}" tabindex="-1" role="dialog" aria-labelledby="modalPost{{post.id}}Label" aria-hidden="true">
                                     <div class="modal-dialog" role="document">

@@ -117,13 +117,13 @@ function clearAndFillMessages(data, idUser) {
             username = `<span class='text-muted'><small>@${data.users[element.fields.sender]}</small></span>`;
         }
         if(element.fields.sender == idUser) {
-            $('#messagesCard').append(`<div class='row justify-content-end' style='margin: 0px;'><div class='card message sentMessage' id='message${element.pk}' data-toggle='tooltip' title='${element.fields.date}'>${element.fields.content}</div></div>`);
+            $('#messagesCard').append(`<div class='row justify-content-end' style='margin: 0px;'><div class='card message sentMessage' id='message${element.pk}' data-toggle='tooltip' title='Sent : ${element.fields.date}'>${element.fields.content}</div></div>`);
         } else {
-            $('#messagesCard').append(`<div class='row justify-content-start' style='margin: 0px;'><div class='col'><div class='card message ${multiUsers}' data-toggle='tooltip' title='${element.fields.date}'>${element.fields.content}</div>${username}</div></div>`);
+            $('#messagesCard').append(`<div class='row justify-content-start' style='margin: 0px;'><div class='col'><div class='card message ${multiUsers}' data-toggle='tooltip' title='Sent : ${element.fields.date}'>${element.fields.content}</div>${username}</div></div>`);
         } 
     });
-    var objDiv = $("#scrollableMessages");
-    objDiv.scrollTop(objDiv.height());
+
+    $("#scrollableMessages").scrollTop($("#messagesCard").height());
 }
 
 function getMessages(idConversation, idUser) {
