@@ -94,6 +94,9 @@ class ListPosts(LoginRequiredMixin, ListView):
             context['family'] = family
         else:
             raise PermissionDenied
+        posts = context['object_list']
+        for post in posts:
+            post.seenBy.add(self.request.user.profile)
         return context
 
 class ListMembers(LoginRequiredMixin, ListView):
@@ -194,6 +197,7 @@ def create_post(request, familyId):
                 new_post.user = request.user.profile
                 new_post.family = selected_family
                 new_post.save()
+                new_post.seenBy.add(request.user.profile)
 
                 new_post.compressImage()
 
@@ -508,7 +512,10 @@ class ListGazettes(LoginRequiredMixin, ListView):
     #paginate_by = 5 # attribut de pagination
 
     def get_queryset(self):
-        return Gazette.objects.filter(family__id=self.kwargs['familyId'])
+        gazettes = Gazette.objects.filter(family__id=self.kwargs['familyId'])
+        for gazette in gazettes:
+            gazette.seenBy.add(self.request.user.profile)
+        return gazettes
 
     def get_context_data(self, **kwargs):
         # Nous récupérons le contexte depuis la super-classe

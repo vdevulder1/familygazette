@@ -6,14 +6,25 @@
                <a href="{% url 'home' %}" class="list-group-item list-group-item-action bg-dark text-white">Accueil</a>
                {% for family in user.profile.families %}
                <button class="list-group-item list-group-item-action bg-dark text-white" type="button" onclick="$('#family{{family.id}}').toggle('show');">
-                    {{family.name}}
+                    {{family.name}} 
+                    {% autoescape off %}
+                         {% unseen_elements_family family user.profile %}
+                    {% endautoescape %}
                     <div id="family{{family.id}}" style="display: none;">
                          <ul style="list-style: none">
                               <li style="padding: 2px">
-                                   <a href="{% url 'family' family.id %}" style="color: #fff"><i class="far fa-images"></i> Actualités</a>
+                                   <a href="{% url 'family' family.id %}" style="color: #fff"><i class="far fa-images"></i> Actualités 
+                                        {% autoescape off %}
+                                             {% unseen_posts_family family user.profile %}
+                                        {% endautoescape %}
+                                   </a>
                               </li>
                               <li style="padding: 2px">
-                                   <a href="{% url 'gazettes' family.id %}" style="color: #fff"><i class="far fa-newspaper"></i> Gazettes</a>
+                                   <a href="{% url 'gazettes' family.id %}" style="color: #fff"><i class="far fa-newspaper"></i> Gazettes 
+                                        {% autoescape off %}
+                                             {% unseen_gazettes_family family user.profile %}
+                                        {% endautoescape %}
+                                   </a>
                               </li>
                               <li style="padding: 2px">
                                    <a href="{% url 'members' family.id %}" style="color: #fff"><i class="fas fa-users"></i> Membres</a>

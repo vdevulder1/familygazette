@@ -51,10 +51,10 @@ class Profile(models.Model):
         """
         return self.family_set.all()
 
-    def unseenMessages(user):
+    def unseenMessages(self):
         unreadMessages = 0
-        for conversation in Conversation.objects.filter(users__id=user.id):
-            unreadMessages += conversation.unseen_messages_count(user)
+        for conversation in Conversation.objects.filter(users__id=self.id):
+            unreadMessages += conversation.unseen_messages_count(self)
 
         return unreadMessages
     
@@ -79,6 +79,24 @@ class Family(models.Model):
     def __str__(self):
         return self.name
 
+    def unseen_elements_count(self, user):
+        """
+        Retourne le nombre d'éléments non lus par un user
+        """
+        return self.unseen_posts_count(user) + self.unseen_gazettes_count(user)
+
+    def unseen_posts_count(self, user):
+        """
+        Retourne le nombre de posts non lus par un user
+        """
+        return self.post_set.exclude(seenBy__id=user.id).count()
+
+    def unseen_gazettes_count(self, user):
+        """
+        Retourne le nombre de gazettes non lues par un user
+        """
+        return self.gazette_set.exclude(seenBy__id=user.id).count()
+
 class Post(models.Model):
     title = models.CharField(max_length=100)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
@@ -86,6 +104,7 @@ class Post(models.Model):
     event_date = models.DateField(default=date.today, verbose_name="Date de l'évènement")
     family = models.ForeignKey(Family, on_delete=models.CASCADE, verbose_name="Famille")
     photo = models.ImageField(upload_to="photos/")
+    seenBy = models.ManyToManyField(Profile, related_name='post_seenBy')
 
     class Meta:
         ordering = ['-publication_date']
@@ -148,6 +167,7 @@ class Gazette(models.Model):
     family = models.ForeignKey(Family, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, default="gazette_familyname_date")
     file = models.FileField(upload_to="gazettes/")
+    seenBy = models.ManyToManyField(Profile, related_name='gazette_seenBy')
 
     class Meta:
         ordering = ['-date']
@@ -183,7 +203,7 @@ class Message(models.Model):
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
     date = models.DateTimeField(default=timezone.now)
     sender = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    seenBy = models.ManyToManyField(Profile, related_name='seenBy_users')
+    seenBy = models.ManyToManyField(Profile, related_name='message_seenBy')
     content = models.TextField()
 
     def __str__(self):
