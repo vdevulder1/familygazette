@@ -10,7 +10,17 @@
         </div>
         <div>
             <h4>{{ statusCode }}</h4>
-	    <p>{{ exception }}</p>
+	        <p><strong>
+                {% if statusCode == 400 %}
+                    Bad Request
+                {% elif statusCode == 403 %}
+                    Access Forbidden
+                {% elif statusCode == 404 %}
+                    Not Found
+                {% elif statusCode == 500 %}
+                    Internal Server Error
+                {% endif %}
+            </strong></p>
         </div>
    </div>
 

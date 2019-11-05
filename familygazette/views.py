@@ -14,13 +14,13 @@ from django.core import mail, serializers
 from django.template.loader import render_to_string, get_template
 from django.template import RequestContext
 from django.utils.html import strip_tags
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponseServerError
+from django.http import HttpResponse
 from django.conf import settings
-import xlwt, zipfile, os
+import xlwt, zipfile, os, json
 from django.core.files.storage import FileSystemStorage
 from PIL import Image
 from django.db.models import Count
-import json
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 
 def handler400(request, exception):
     statusCode = 400
@@ -57,11 +57,13 @@ def logIn(request):
 
     return render(request, 'login.html', locals())
 
+@login_required
 def logOut(request):
     logout(request)
     return redirect(reverse(logIn))
 
 @login_required
+@require_GET
 def accessMedia(request):
     response = HttpResponse('')
     response['X-Accel-Redirect'] = request.path.replace('media', 'files')
@@ -69,6 +71,7 @@ def accessMedia(request):
     return response
 
 @login_required
+@require_GET
 def home(request):
     """Page d'accueil"""
 
@@ -86,7 +89,11 @@ class ListPosts(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         # Nous récupérons le contexte depuis la super-classe
         context = super(ListPosts, self).get_context_data(**kwargs)
-        context['family'] = get_object_or_404(Family, id=self.kwargs['familyId']) 
+        family = get_object_or_404(Family, id=self.kwargs['familyId'])
+        if self.request.user.profile in family.members.all():
+            context['family'] = family
+        else:
+            raise PermissionDenied
         return context
 
 class ListMembers(LoginRequiredMixin, ListView):
@@ -99,16 +106,22 @@ class ListMembers(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ListMembers, self).get_context_data(**kwargs)
-        context['family'] = get_object_or_404(Family, id=self.kwargs['familyId'])
+        family = get_object_or_404(Family, id=self.kwargs['familyId'])
+        if self.request.user.profile in family.members.all():
+            context['family'] = family
+        else:
+            raise PermissionDenied
         return context
 
 @login_required
+@require_GET
 def my_profile(request):
     profile = get_object_or_404(Profile, id=request.user.profile.id)
 
     return render(request, 'profile.html', {'profile': profile})
 
 @login_required
+@require_GET
 def get_profile(request, profileId):
 
     if profileId == request.user.profile.id :
@@ -116,7 +129,11 @@ def get_profile(request, profileId):
 
     profile = get_object_or_404(Profile, id=profileId)
 
-    return render(request, 'profile.html', {'profile': profile})
+    for family in profile.families :
+        if family in request.user.profile.families :
+            return render(request, 'profile.html', {'profile': profile})
+    
+    raise PermissionDenied
 
 @login_required
 def update_profile(request):
@@ -152,55 +169,62 @@ def update_profile(request):
 
 @login_required
 def create_post(request, familyId):
-    error = False
-    update = False
-    posted =  False
 
-    if request.method == 'POST':
-        posted = True
+    family = get_object_or_404(Family, id=familyId)
+    if family in request.user.profile.families :
 
-    form = PostForm(request.POST or None, request.FILES or None, user=request.user.profile)
+        error = False
+        update = False
+        posted =  False
+
+        if request.method == 'POST':
+            posted = True
+
+        form = PostForm(request.POST or None, request.FILES or None, user=request.user.profile)
+        
+        if form.is_valid():
+            families = form.cleaned_data['families']
+            uploaded_photo = form.cleaned_data['photo']
+            for family in families :
+                selected_family = get_object_or_404(Family, id=family.id)
+                new_post = Post()
+                new_post.title = form.cleaned_data['title']
+                new_post.event_date = form.cleaned_data['event_date']
+                new_post.photo = uploaded_photo
+                new_post.user = request.user.profile
+                new_post.family = selected_family
+                new_post.save()
+
+                new_post.compressImage()
+
+                for member in selected_family.members.all().exclude(user=request.user) :
+                    if member.postNewsletter and member.user.email :
+                        subject = 'Nouveau post pour la famille ' + selected_family.name
+                        content = 'Nouveau post : \'{0}\' par {1}'.format(new_post.title, request.user.username)
+                        context = {
+                            'subject': subject,
+                            'content': content,
+                            'url': 'family/' + str(selected_family.id),
+                            'fromForm': False
+                        }
+                        html_message = render_to_string('mail.html', context)
+                        plain_message = strip_tags(html_message)
+                        mail.send_mail(
+                            subject,
+                            plain_message,
+                            settings.EMAIL_HOST_USER,
+                            [member.user.email],
+                            html_message=html_message
+                        )
+
+            return redirect('family', familyId=familyId)
+        else:
+            error = True
+        
+        return render(request, 'new-post.html', locals())
     
-    if form.is_valid():
-        families = form.cleaned_data['families']
-        uploaded_photo = form.cleaned_data['photo']
-        for family in families :
-            selected_family = get_object_or_404(Family, id=family.id)
-            new_post = Post()
-            new_post.title = form.cleaned_data['title']
-            new_post.event_date = form.cleaned_data['event_date']
-            new_post.photo = uploaded_photo
-            new_post.user = request.user.profile
-            new_post.family = selected_family
-            new_post.save()
-
-            new_post.compressImage()
-
-            for member in selected_family.members.all().exclude(user=request.user) :
-                if member.postNewsletter and member.user.email :
-                    subject = 'Nouveau post pour la famille ' + selected_family.name
-                    content = 'Nouveau post : \'{0}\' par {1}'.format(new_post.title, request.user.username)
-                    context = {
-                        'subject': subject,
-                        'content': content,
-                        'url': 'family/' + str(selected_family.id),
-                        'fromForm': False
-                    }
-                    html_message = render_to_string('mail.html', context)
-                    plain_message = strip_tags(html_message)
-                    mail.send_mail(
-                        subject,
-                        plain_message,
-                        settings.EMAIL_HOST_USER,
-                        [member.user.email],
-                        html_message=html_message
-                    )
-
-        return redirect('family', familyId=familyId)
     else:
-        error = True
-    
-    return render(request, 'new-post.html', locals())
+        raise PermissionDenied
 
 @login_required
 def update_post(request, postId):
@@ -243,7 +267,7 @@ def update_post(request, postId):
             'update': True
         })
     else :
-        return HttpResponseForbidden("Action Forbidden.")
+        raise PermissionDenied
 
 @login_required
 @require_POST
@@ -256,75 +280,80 @@ def delete_post(request, postId):
 
         return redirect('family', familyId=familyId)
     else:
-        return HttpResponseForbidden("Action Forbidden.")
+        raise PermissionDenied
 
 @login_required
 @require_POST
 def create_comment(request, familyId, postId):
-    error = False
-    query_params = "?"
-    referer = request.META['HTTP_REFERER'].split('?')
-    if len(referer) > 1 :
-        query_params += referer[1]
 
-    url = '{0}{1}#idPost{2}'.format(reverse('family', args=[familyId]), query_params, postId)
+    family = get_object_or_404(Family, id=familyId)
+    selected_post = get_object_or_404(Post, id=postId)
+    if family in request.user.profile.families and family == selected_post.family :
 
-    form = CommentForm(request.POST or None)
-    if form.is_valid():
-        selected_post = get_object_or_404(Post, id=postId)
-        past_comments = selected_post.comments
-        new_comment = Comment()
-        new_comment.content = form.cleaned_data['content']
-        new_comment.user = request.user.profile
-        new_comment.post = selected_post
-        new_comment.save()
+        error = False
+        query_params = "?"
+        referer = request.META['HTTP_REFERER'].split('?')
+        if len(referer) > 1 :
+            query_params += referer[1]
 
-        users_who_commented = Profile.objects.filter(comment__post=selected_post).distinct().exclude(user=request.user)
-        if users_who_commented :
-            messages = []
-            for user in users_who_commented :
-                if user.commentNewsletter and user.user.email :
-                    subject = 'Nouveau commentaire de ' + request.user.username
-                    content = '{0} a également commenté la photo \'{1}\''.format(request.user.username, selected_post.title)
-                    context = {
-                        'subject': subject,
-                        'content': content,
-                        'url': url,
-                        'fromForm': False
-                    }
-                    html_message = render_to_string('mail.html', context)
-                    plain_message = strip_tags(html_message)
-                    mail.send_mail(
-                        subject,
-                        plain_message,
-                        settings.EMAIL_HOST_USER,
-                        [user.user.email],
-                        html_message=html_message
-                    )
+        url = '{0}{1}#idPost{2}'.format(reverse('family', args=[familyId]), query_params, postId)
 
-        if selected_post.user.user != request.user and selected_post.user not in users_who_commented and selected_post.user.commentNewsletter and selected_post.user.user.email :
-            subject = 'Nouveau commentaire de ' + request.user.username
-            content = 'Nouveau commentaire sur votre photo \'{0}\''.format(selected_post.title)
-            context = {
-                'subject': subject,
-                'content': content,
-                'url': url,
-                'fromForm': False
-            }
-            html_message = render_to_string('mail.html', context)
-            plain_message = strip_tags(html_message)
-            mail.send_mail(
-                subject,
-                plain_message,
-                settings.EMAIL_HOST_USER,
-                [selected_post.user.user.email],
-                html_message=html_message
-            )
+        form = CommentForm(request.POST or None)
+        if form.is_valid():
+            new_comment = Comment()
+            new_comment.content = form.cleaned_data['content']
+            new_comment.user = request.user.profile
+            new_comment.post = selected_post
+            new_comment.save()
 
-        return redirect(url)
+            users_who_commented = Profile.objects.filter(comment__post=selected_post).distinct().exclude(user=request.user)
+            if users_who_commented :
+                messages = []
+                for user in users_who_commented :
+                    if user.commentNewsletter and user.user.email :
+                        subject = 'Nouveau commentaire de ' + request.user.username
+                        content = '{0} a également commenté la photo \'{1}\''.format(request.user.username, selected_post.title)
+                        context = {
+                            'subject': subject,
+                            'content': content,
+                            'url': url,
+                            'fromForm': False
+                        }
+                        html_message = render_to_string('mail.html', context)
+                        plain_message = strip_tags(html_message)
+                        mail.send_mail(
+                            subject,
+                            plain_message,
+                            settings.EMAIL_HOST_USER,
+                            [user.user.email],
+                            html_message=html_message
+                        )
+
+            if selected_post.user.user != request.user and selected_post.user not in users_who_commented and selected_post.user.commentNewsletter and selected_post.user.user.email :
+                subject = 'Nouveau commentaire de ' + request.user.username
+                content = 'Nouveau commentaire sur votre photo \'{0}\''.format(selected_post.title)
+                context = {
+                    'subject': subject,
+                    'content': content,
+                    'url': url,
+                    'fromForm': False
+                }
+                html_message = render_to_string('mail.html', context)
+                plain_message = strip_tags(html_message)
+                mail.send_mail(
+                    subject,
+                    plain_message,
+                    settings.EMAIL_HOST_USER,
+                    [selected_post.user.user.email],
+                    html_message=html_message
+                )
+
+            return redirect(url)
+        else:
+            error = True
+            return redirect(url)
     else:
-        error = True
-        return redirect(url)
+        raise PermissionDenied
 
 @login_required
 @require_POST
@@ -346,7 +375,7 @@ def update_comment(request, commentId):
         else:
             return redirect(url)
     else:
-        return HttpResponseForbidden("Action Forbidden.")
+        raise PermissionDenied
 
     
 @login_required
@@ -358,7 +387,7 @@ def delete_comment(request, commentId):
         comment.delete()
         return redirect('family', familyId=comment.post.family.id)
     else:
-        return HttpResponseForbidden("Action Forbidden.")
+        raise PermissionDenied
 
 class ListSuggestions(LoginRequiredMixin, ListView):
     model = Suggestion
@@ -484,22 +513,29 @@ class ListGazettes(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         # Nous récupérons le contexte depuis la super-classe
         context = super(ListGazettes, self).get_context_data(**kwargs)
-        context['family'] = get_object_or_404(Family, id=self.kwargs['familyId']) 
+        family = get_object_or_404(Family, id=self.kwargs['familyId'])
+        if self.request.user.profile in family.members.all():
+            context['family'] = family
+        else:
+            raise PermissionDenied
         return context
 
 @login_required
 @require_GET
 def download_gazette(request, gazetteId):
     gazette = get_object_or_404(Gazette, id=gazetteId)
-    fs = FileSystemStorage()
-    filename = gazette.file.path
-    if fs.exists(filename):
-        with fs.open(filename) as pdf:
-            response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename="{0}.pdf"'.format(gazette.name)
-            return response
+    if gazette.family in request.user.profile.families :
+        fs = FileSystemStorage()
+        filename = gazette.file.path
+        if fs.exists(filename):
+            with fs.open(filename) as pdf:
+                response = HttpResponse(pdf, content_type='application/pdf')
+                response['Content-Disposition'] = 'attachment; filename="{0}.pdf"'.format(gazette.name)
+                return response
+        else:
+            raise ObjectDoesNotExist
     else:
-        return HttpResponseNotFound('The requested pdf was not found in our server.')
+        raise PermissionDenied
 
 @login_required
 @require_POST
@@ -510,12 +546,12 @@ def rotate_img(request, model, modelId, rotation):
         if request.user.profile == obj.user :
             path = obj.photo.path
         else :
-            return HttpResponseForbidden("Action Forbidden.")
+            raise PermissionDenied
     elif model == 'profile':
         obj = get_object_or_404(Profile, id=request.user.id)
         path = obj.avatar.path
     else :
-        return HttpResponseForbidden("Action Forbidden.")
+        raise ObjectDoesNotExist
     
     rotate = [Image.ROTATE_90, Image.ROTATE_180, Image.ROTATE_270]
     
@@ -529,6 +565,7 @@ def rotate_img(request, model, modelId, rotation):
         return redirect('update{0}'.format(model.capitalize()), modelId)
 
 @login_required
+@require_GET
 def messages(request):
 
     conversations = Conversation.objects.filter(users=request.user.profile)
@@ -637,7 +674,7 @@ def get_messages(request, conversationId):
             message.seenBy.add(request.user.profile)
         return HttpResponse(json.dumps(data), content_type='application/json')
     else:
-        return HttpResponseForbidden("Action Forbidden.")
+        raise PermissionDenied
 
 @login_required
 @require_POST
@@ -665,6 +702,6 @@ def new_message(request, conversationId):
 
             return HttpResponse(json.dumps(data), content_type='application/json')
         else:
-            return HttpResponseServerError('Form not valid')
+            raise ValidationError
     else:
-        return HttpResponseForbidden("Action Forbidden.")
+        raise PermissionDenied
