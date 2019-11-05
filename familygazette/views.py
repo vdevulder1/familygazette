@@ -208,6 +208,13 @@ def update_post(request, postId):
     posted = False
     post = get_object_or_404(Post, id=postId)
 
+    query_params = "?"
+    referer = request.META['HTTP_REFERER'].split('?')
+    if len(referer) > 1 :
+        query_params += referer[1]
+
+    url = '{0}{1}#idPost{2}'.format(reverse('family', args=[post.family.id]), query_params, postId)
+
     if request.user.profile == post.user :
         if request.method == 'POST':
             posted = True
@@ -224,7 +231,7 @@ def update_post(request, postId):
                     if post_.photo :
                         post_.compressImage()
 
-                return redirect('family', familyId=post.family.id)
+                return redirect(url)
             else:
                 error = True
         else:
@@ -255,6 +262,12 @@ def delete_post(request, postId):
 @require_POST
 def create_comment(request, familyId, postId):
     error = False
+    query_params = "?"
+    referer = request.META['HTTP_REFERER'].split('?')
+    if len(referer) > 1 :
+        query_params += referer[1]
+
+    url = '{0}{1}#idPost{2}'.format(reverse('family', args=[familyId]), query_params, postId)
 
     form = CommentForm(request.POST or None)
     if form.is_valid():
@@ -265,25 +278,6 @@ def create_comment(request, familyId, postId):
         new_comment.user = request.user.profile
         new_comment.post = selected_post
         new_comment.save()
-        
-        if selected_post.user.user != request.user and selected_post.user.commentNewsletter and selected_post.user.user.email :
-            subject = 'Nouveau commentaire de ' + request.user.username
-            content = 'Nouveau commentaire sur votre photo \'{0}\''.format(selected_post.title)
-            context = {
-                'subject': subject,
-                'content': content,
-                'url': 'family/' + str(selected_post.family.id),
-                'fromForm': False
-            }
-            html_message = render_to_string('mail.html', context)
-            plain_message = strip_tags(html_message)
-            mail.send_mail(
-                subject,
-                plain_message,
-                settings.EMAIL_HOST_USER,
-                [selected_post.user.user.email],
-                html_message=html_message
-            )
 
         users_who_commented = Profile.objects.filter(comment__post=selected_post).distinct().exclude(user=request.user)
         if users_who_commented :
@@ -295,7 +289,7 @@ def create_comment(request, familyId, postId):
                     context = {
                         'subject': subject,
                         'content': content,
-                        'url': 'family/' + str(selected_post.family.id),
+                        'url': url,
                         'fromForm': False
                     }
                     html_message = render_to_string('mail.html', context)
@@ -308,23 +302,49 @@ def create_comment(request, familyId, postId):
                         html_message=html_message
                     )
 
-        return redirect('family', familyId=familyId)
+        if selected_post.user.user != request.user and selected_post.user not in users_who_commented and selected_post.user.commentNewsletter and selected_post.user.user.email :
+            subject = 'Nouveau commentaire de ' + request.user.username
+            content = 'Nouveau commentaire sur votre photo \'{0}\''.format(selected_post.title)
+            context = {
+                'subject': subject,
+                'content': content,
+                'url': url,
+                'fromForm': False
+            }
+            html_message = render_to_string('mail.html', context)
+            plain_message = strip_tags(html_message)
+            mail.send_mail(
+                subject,
+                plain_message,
+                settings.EMAIL_HOST_USER,
+                [selected_post.user.user.email],
+                html_message=html_message
+            )
+
+        return redirect(url)
     else:
         error = True
-        return redirect('family', familyId=familyId)
+        return redirect(url)
 
 @login_required
 @require_POST
 def update_comment(request, commentId):
+
+    query_params = "?"
+    referer = request.META['HTTP_REFERER'].split('?')
+    if len(referer) > 1 :
+        query_params += referer[1]
     
     comment = get_object_or_404(Comment, id=commentId)
+    url = '{0}{1}#idPost{2}'.format(reverse('family', args=[comment.post.family.id]), query_params, comment.post.id)
+
     if request.user.profile == comment.user :
         form = CommentForm(request.POST, instance=comment)
         if form.is_valid():
             form.save()
-            return redirect('family', familyId=comment.post.family.id)
+            return redirect(url)
         else:
-            return redirect('family', familyId=comment.post.family.id)
+            return redirect(url)
     else:
         return HttpResponseForbidden("Action Forbidden.")
 
@@ -586,7 +606,7 @@ def new_mail(request):
         html_message = render_to_string('mail.html', context)
         plain_message = strip_tags(html_message)
         for family in Family.objects.all() :
-            for member in family.members.all().exclude(user=request.user) :
+            for member in family.members.all().distinct().exclude(user=request.user) :
                     if member.generalNewsletter and member.user.email :
                         mail.send_mail(
                             subject,
