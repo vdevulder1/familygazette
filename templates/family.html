@@ -79,7 +79,7 @@
                                                 <span>
                                                     <form method="POST" action="{% url 'updateComment' comment.id %}">
                                                         {% csrf_token %}
-                                                        <input type="text" id="comment{{comment.id}}" name="content" style="width: 100%;" maxlength=400 value="{{comment.content}}" readonly>
+                                                        <input type="text" class="form-control" id="comment{{comment.id}}" name="content" style="width: 100%;" maxlength=400 value="{{comment.content}}" readonly>
                                                     </form>
                                                 </span>
                                                 
@@ -126,7 +126,7 @@
                             <div id="post{{post.id}}" style="display: none;">
                                 <form method="POST" action="{% url 'newComment' family.id post.id %}">
                                     {% csrf_token %}
-                                    <input type="text" name="content" style="width: 100%;" maxlength=400>
+                                    <input type="text" class="form-control" name="content" style="width: 100%;" maxlength=400>
                                     <button class="btn btn-success btnNewElement" type="submit">Envoyer</button>
                                 </form>
                             </div>

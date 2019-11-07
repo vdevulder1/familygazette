@@ -21,6 +21,7 @@ from django.core.files.storage import FileSystemStorage
 from PIL import Image
 from django.db.models import Count
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
+from django.core.files import File
 
 def handler400(request, exception):
     statusCode = 400
@@ -187,17 +188,29 @@ def create_post(request, familyId):
         
         if form.is_valid():
             families = form.cleaned_data['families']
-            uploaded_photo = form.cleaned_data['photo']
+            #uploaded_photo = form.cleaned_data['photo']
+            already_uploaded = False
             for family in families :
                 selected_family = get_object_or_404(Family, id=family.id)
                 new_post = Post()
                 new_post.title = form.cleaned_data['title']
                 new_post.event_date = form.cleaned_data['event_date']
-                new_post.photo = uploaded_photo
                 new_post.user = request.user.profile
                 new_post.family = selected_family
-                new_post.save()
+                if already_uploaded:
+                    new_post.save()
+                    path = uploaded_photo_path.split('.')[0]
+                    f = open(path + '.jpg', 'rb')
+                    new_post.photo.save(uploaded_photo_path.split('/')[-1], f)
+                else:
+                    new_post.photo = form.cleaned_data['photo']
+                    new_post.save()
                 new_post.seenBy.add(request.user.profile)
+
+                if not already_uploaded:
+                    photo = get_object_or_404(Post, id=new_post.id).photo
+                    uploaded_photo_path = photo.path
+                    already_uploaded = True
 
                 new_post.compressImage()
 
@@ -208,7 +221,7 @@ def create_post(request, familyId):
                         context = {
                             'subject': subject,
                             'content': content,
-                            'url': 'family/' + str(selected_family.id),
+                            'url': '/family/' + str(selected_family.id),
                             'fromForm': False
                         }
                         html_message = render_to_string('mail.html', context)
@@ -418,7 +431,7 @@ def create_suggestion(request):
         context = {
             'subject': subject,
             'content': content,
-            'url': 'suggestions',
+            'url': '/suggestions',
             'fromForm': False
         }
         html_message = render_to_string('mail.html', context)
@@ -606,7 +619,7 @@ def new_conversation(request):
                     context = {
                         'subject': subject,
                         'content': content,
-                        'url': 'messages',
+                        'url': '/messages',
                         'fromForm': False
                     }
                     html_message = render_to_string('mail.html', context)
@@ -644,7 +657,7 @@ def new_mail(request):
         context = {
             'subject': subject,
             'content': content,
-            'url': 'home',
+            'url': '/home',
             'fromForm': True
         }
         html_message = render_to_string('mail.html', context)
