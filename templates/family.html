@@ -10,7 +10,7 @@
             <button class="btn btn-secondary" onclick="document.location.href='{% url 'generateDocument' family.id %}';">Générer la gazette</button>
         {% endif %}
         {% if carousel %}
-            <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' list %}';"><i class="fas fa-list"></i></button>
+            <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' 'list' %}';"><i class="fas fa-list"></i></button>
         {% else %}
             <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' 'carousel' %}';"><i class="fas fa-photo-video"></i></button>
         {% endif %}
@@ -75,12 +75,14 @@
                                             </div>
                                         </div>
                                         <div class="element_content">
-                                            <span>
-                                                <form method="POST" action="{% url 'updateComment' comment.id %}">
-                                                    {% csrf_token %}
-                                                    <input type="text" class="form-control" id="comment{{comment.id}}" name="content" style="width: 100%;" maxlength=400 value="{{comment.content}}" readonly>
-                                                </form>
-                                            </span>
+                                            
+                                            <form method="POST" action="{% url 'updateComment' comment.id %}">
+                                                {% csrf_token %}
+                                                <span>
+                                                    <textarea type="text" rows="1" class="form-control" id="comment{{comment.id}}" name="content" style="width: 100%;" maxlength=400 readonly>{{comment.content}}</textarea>
+                                                </span>
+                                                <button class="btn btn-success btnNewElement" id="btnUpdateComment{{comment.id}}" type="submit" style="display: none;">Envoyer</button>
+                                            </form>
                                             
                                             <div class="btnElement">
                                                 {% if comment.user == user.profile %}
@@ -125,7 +127,7 @@
                         <div id="post{{post.id}}" style="display: none;">
                             <form method="POST" action="{% url 'newComment' family.id post.id %}">
                                 {% csrf_token %}
-                                <input type="text" class="form-control" name="content" style="width: 100%;" maxlength=400>
+                                <textarea type="text" rows="1" class="form-control" name="content" style="width: 100%;" placeholder="Veuillez entrer du texte" maxlength=400></textarea>
                                 <button class="btn btn-success btnNewElement" type="submit">Envoyer</button>
                             </form>
                         </div>
@@ -199,19 +201,22 @@
                                                 </div>
                                             </div>
                                             <div class="element_content">
-                                                <span>
-                                                    <form method="POST" action="{% url 'updateComment' comment.id %}">
-                                                        {% csrf_token %}
-                                                        <input type="text" class="form-control" id="comment{{comment.id}}" name="content" style="width: 100%;" maxlength=400 value="{{comment.content}}" readonly>
-                                                    </form>
-                                                </span>
                                                 
+                                                <form method="POST" action="{% url 'updateComment' comment.id %}">
+                                                    {% csrf_token %}
+                                                    <span>
+                                                        <textarea type="text" class="form-control" rows="1" id="comment{{comment.id}}" name="content" style="width: 100%;" maxlength=400 readonly>{{comment.content}}</textarea>
+                                                    </span>
+                                                    <button class="btn btn-success btnNewElement" id="btnUpdateComment{{comment.id}}" type="submit" style="display: none;">Envoyer</button>
+                                                </form>
+
                                                 <div class="btnElement">
                                                     {% if comment.user == user.profile %}
                                                         <button class="btn" onclick="updateComment({{comment.id}});"><i class="fas fa-pen"></i></button>
                                                         <button class="btn" type="button" data-toggle="modal" data-target="#modalComment{{comment.id}}"><i class="fas fa-trash-alt"></i></button>
                                                     {% endif %}
                                                 </div>
+                                                
 
                                                 <div class="modal fade" id="modalComment{{comment.id}}" tabindex="-1" role="dialog" aria-labelledby="modalComment{{comment.id}}Label" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
@@ -249,7 +254,7 @@
                             <div id="post{{post.id}}" style="display: none;">
                                 <form method="POST" action="{% url 'newComment' family.id post.id %}">
                                     {% csrf_token %}
-                                    <input type="text" class="form-control" name="content" style="width: 100%;" maxlength=400>
+                                    <textarea type="text" rows="1" class="form-control" name="content" style="width: 100%;" placeholder="Veuillez entrer du texte" maxlength=400></textarea>
                                     <button class="btn btn-success btnNewElement" type="submit">Envoyer</button>
                                 </form>
                             </div>
