@@ -85,6 +85,11 @@ $(document).ready(function () {
         }
     });
 
+    $('#myCarousel').on('slide.bs.carousel', function (e) {
+        $(`#carouselItem${e.from}`).toggle('show');
+        $(`#carouselItem${e.to}`).toggle('show');
+    });
+
 });
 
 function addComment(nb) {
