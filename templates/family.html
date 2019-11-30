@@ -1,16 +1,141 @@
 {% extends "index.html" %}
 {% block content %}
+{% load extras_tags %}
     
     <div class="card-header">
         <h5><strong>{{ family.name }}</strong></h5>
         Dernières actualités
-        <button id="newPostButton" class="btn  btn-success" onclick="document.location.href='{% url 'newPost' family.id %}';"><i class="far fa-plus-square"></i> Créer un nouveau post</button>
+        <button id="newPostButton" class="btn btn-success" onclick="document.location.href='{% url 'newPost' family.id %}';"><i class="far fa-plus-square"></i> Créer un nouveau post</button>
         {% if user.is_staff %}
             <button class="btn btn-secondary" onclick="document.location.href='{% url 'generateDocument' family.id %}';">Générer la gazette</button>
+        {% endif %}
+        {% if carousel %}
+            <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' 'list' %}';"><i class="fas fa-list"></i></button>
+        {% else %}
+            <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' 'carousel' %}';"><i class="fas fa-photo-video"></i></button>
         {% endif %}
     </div>
     <div class="card-body">
         {% if posts %}
+            {% if carousel %}
+            <div class="card">
+                <div id="myCarousel" class="carousel slide" data-ride="carousel">
+                  <ol class="carousel-indicators">
+                    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                    <li data-target="#myCarousel" data-slide-to="1"></li>
+                    <li data-target="#myCarousel" data-slide-to="2"></li>
+                  </ol>
+                  <div class="carousel-inner">
+                    {% for post in posts %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}" data-interval="10000" style="max-height: 100vh;">
+                      <img src="{{ post.photo.url }}" class="d-block" alt="Photo" style="height: 100%;">
+                      <div class="carousel-caption d-block" style="background-color: rgba(0, 0, 0, 0.5); width: 100%; right: auto; left: auto;">
+                        <div class="user_container">
+                            {% if post.user.avatar %}
+                                <img src="{{ post.user.avatar.url }}" alt="Avatar" class="avatar avatarPost">
+                            {% endif %}
+                            <div style="display: block;">
+                                <h5>{{post.event_date}} - {{ post.title }}</h5>
+                                <span class="user_name" style="color: #85e085;">
+                                    <small >Publié le {{ post.publication_date }} par </small><strong>{{post.user}}</strong>
+                                </span>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                  </a>
+                  <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                  </a>
+                </div>
+                {% for post in posts %}
+                <div class="card" id="carouselItem{{forloop.counter0}}" {% if not forloop.first %}style="display: none;"{% endif %}>
+                    <div class="card-header">
+                        Commentaires
+                    </div>
+                    <div class="card-body">
+                        {% if post.comments %}
+                            <ul class="list-group list-group-flush">
+                                {% for comment in post.comments %}
+                                    <li class="list-group-item">
+                                        <div>
+                                            <div class="user_container">
+                                                {% if comment.user.avatar %}
+                                                    <img src="{{ comment.user.avatar.url }}" alt="Avatar" class="avatar avatarComment">
+                                                {% endif %}
+                                                <span class="user_name">
+                                                    <small>{{comment.user}} - {{comment.date}}</small>
+                                                </span>    
+                                            </div>
+                                        </div>
+                                        <div class="element_content">
+                                            
+                                            <form method="POST" action="{% url 'updateComment' comment.id %}">
+                                                {% csrf_token %}
+                                                <span>
+                                                    <textarea type="text" rows="1" class="form-control" id="comment{{comment.id}}" name="content" style="width: 100%;" maxlength=400 readonly>{{comment.content}}</textarea>
+                                                </span>
+                                                <button class="btn btn-success btnNewElement" id="btnUpdateComment{{comment.id}}" type="submit" style="display: none;">Envoyer</button>
+                                            </form>
+                                            
+                                            <div class="btnElement">
+                                                {% if comment.user == user.profile %}
+                                                    <button class="btn" onclick="updateComment({{comment.id}});"><i class="fas fa-pen"></i></button>
+                                                    <button class="btn" type="button" data-toggle="modal" data-target="#modalComment{{comment.id}}"><i class="fas fa-trash-alt"></i></button>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="modal fade" id="modalComment{{comment.id}}" tabindex="-1" role="dialog" aria-labelledby="modalComment{{comment.id}}Label" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="modalComment{{comment.id}}Label">Confirmation</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Voulez-vous vraiment supprimer le commentaire '{{comment.content}}' ?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                                        <form method="POST">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-danger" formaction="{% url 'deleteComment' comment.id %}">Supprimer</button>
+                                                        </form>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div class="noComment">Pas de commentaire à afficher.</div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-sm btn-primary btnNewElement" onclick="addComment({{post.id}});"><i class="fas fa-plus"></i> Ajouter un commentaire</button>
+                        <div id="post{{post.id}}" style="display: none;">
+                            <form method="POST" action="{% url 'newComment' family.id post.id %}">
+                                {% csrf_token %}
+                                <textarea type="text" rows="1" class="form-control" name="content" style="width: 100%;" placeholder="Veuillez entrer du texte" maxlength=400></textarea>
+                                <button class="btn btn-success btnNewElement" type="submit">Envoyer</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
             {% for post in posts %}
             <div class="card mb-3">
                 <div class="image-container">
@@ -76,19 +201,22 @@
                                                 </div>
                                             </div>
                                             <div class="element_content">
-                                                <span>
-                                                    <form method="POST" action="{% url 'updateComment' comment.id %}">
-                                                        {% csrf_token %}
-                                                        <input type="text" class="form-control" id="comment{{comment.id}}" name="content" style="width: 100%;" maxlength=400 value="{{comment.content}}" readonly>
-                                                    </form>
-                                                </span>
                                                 
+                                                <form method="POST" action="{% url 'updateComment' comment.id %}">
+                                                    {% csrf_token %}
+                                                    <span>
+                                                        <textarea type="text" class="form-control" rows="1" id="comment{{comment.id}}" name="content" style="width: 100%;" maxlength=400 readonly>{{comment.content}}</textarea>
+                                                    </span>
+                                                    <button class="btn btn-success btnNewElement" id="btnUpdateComment{{comment.id}}" type="submit" style="display: none;">Envoyer</button>
+                                                </form>
+
                                                 <div class="btnElement">
                                                     {% if comment.user == user.profile %}
                                                         <button class="btn" onclick="updateComment({{comment.id}});"><i class="fas fa-pen"></i></button>
                                                         <button class="btn" type="button" data-toggle="modal" data-target="#modalComment{{comment.id}}"><i class="fas fa-trash-alt"></i></button>
                                                     {% endif %}
                                                 </div>
+                                                
 
                                                 <div class="modal fade" id="modalComment{{comment.id}}" tabindex="-1" role="dialog" aria-labelledby="modalComment{{comment.id}}Label" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
@@ -126,7 +254,7 @@
                             <div id="post{{post.id}}" style="display: none;">
                                 <form method="POST" action="{% url 'newComment' family.id post.id %}">
                                     {% csrf_token %}
-                                    <input type="text" class="form-control" name="content" style="width: 100%;" maxlength=400>
+                                    <textarea type="text" rows="1" class="form-control" name="content" style="width: 100%;" placeholder="Veuillez entrer du texte" maxlength=400></textarea>
                                     <button class="btn btn-success btnNewElement" type="submit">Envoyer</button>
                                 </form>
                             </div>
@@ -136,6 +264,7 @@
                 </div>
             </div>
             {% endfor %}
+            {% endif %}
         {% else %}
             <p><h6>Pas encore de publication.</h6></p>
         {% endif %}

@@ -56,3 +56,9 @@ def unseen_elements_family(family, user):
         html = "<span class='badge badge-primary badge-pill' id='notifsFamily{0}'>{1}</span>".format(family.id, unseen_elements)
     
     return html
+
+@register.simple_tag(takes_context = True)
+def url_replace(context, field, value):
+    dict_ = context['request'].GET.copy()
+    dict_[field] = value
+    return dict_.urlencode()

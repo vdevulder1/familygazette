@@ -98,6 +98,11 @@ class ListPosts(LoginRequiredMixin, ListView):
         posts = context['object_list']
         for post in posts:
             post.seenBy.add(self.request.user.profile)
+        if self.request.GET.get('display') == 'carousel' :
+            context['carousel'] = True
+        else:
+            context['carousel'] = False
+            
         return context
 
 class ListMembers(LoginRequiredMixin, ListView):

@@ -85,6 +85,22 @@ $(document).ready(function () {
         }
     });
 
+    $('#myCarousel').on('slide.bs.carousel', function (e) {
+        $(`#carouselItem${e.from}`).toggle('show');
+        $(`#carouselItem${e.to}`).toggle('show');
+    });
+    
+    $('textarea').each(function () {
+        if (this.scrollHeight !== 0) {
+            this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;resize:none;');
+        } else {
+            this.setAttribute('style', 'resize:none;');
+        }
+    }).on('input', function () {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+
 });
 
 function addComment(nb) {
@@ -95,6 +111,7 @@ function addComment(nb) {
 function updateComment(nb) {
     comment = "#comment" + nb;
     $(comment).prop('readonly', false);
+    $(`#btnUpdateComment${nb}`).toggle('show');
 }
 
 function addSuggestion() {
