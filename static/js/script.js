@@ -88,17 +88,16 @@ $(document).ready(function () {
     $('#myCarousel').on('slide.bs.carousel', function (e) {
         $(`#carouselItem${e.from}`).toggle('show');
         $(`#carouselItem${e.to}`).toggle('show');
+        resizeTextAreas();
     });
     
-    $('textarea').each(function () {
-        if (this.scrollHeight !== 0) {
-            this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;resize:none;');
-        } else {
-            this.setAttribute('style', 'resize:none;');
-        }
-    }).on('input', function () {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
+    resizeTextAreas();
+
+    $('img').each(function(){
+        let target = $(this).attr('data-target');
+        $(this).ready(function() {
+            $(`#${target}`).remove();
+        });
     });
 
 });
@@ -164,4 +163,17 @@ function getMessages(idConversation, idUser) {
             $('#notifsSidebar').text(remainingMessages);
         }
     }
+}
+
+function resizeTextAreas() {
+    $('textarea').each(function () {
+        if (this.scrollHeight !== 0) {
+            this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;resize:none;');
+        } else {
+            this.setAttribute('style', 'resize:none;');
+        }
+    }).on('input', function () {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
 }

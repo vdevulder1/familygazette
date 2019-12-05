@@ -21,14 +21,19 @@
             <div class="card">
                 <div id="myCarousel" class="carousel slide" data-ride="carousel">
                   <ol class="carousel-indicators">
-                    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-                    <li data-target="#myCarousel" data-slide-to="1"></li>
-                    <li data-target="#myCarousel" data-slide-to="2"></li>
+                    {% for post in posts %}
+                        <li data-target="#myCarousel" data-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></li>
+                    {% endfor %}
                   </ol>
                   <div class="carousel-inner">
                     {% for post in posts %}
-                    <div class="carousel-item {% if forloop.first %}active{% endif %}" data-interval="10000" style="max-height: 100vh;">
-                      <img src="{{ post.photo.url }}" class="d-block" alt="Photo" style="height: 100%;">
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}" data-interval="10000" style="max-height: 100vh; background-color: #ecf2f9;">
+                      <img src="{{ post.photo.url }}" data-target="loader{{ forloop.counter0 }}" class="d-block" alt="Photo" style="max-height: 100vh;">
+                      <div class="loader d-flex justify-content-center" id="loader{{ forloop.counter0 }}">
+                        <div class="spinner-border text-light my-auto" role="status">
+                            <span class="sr-only">Loading...</span>
+                          </div>
+                      </div>
                       <div class="carousel-caption d-block" style="background-color: rgba(0, 0, 0, 0.5); width: 100%; right: auto; left: auto;">
                         <div class="user_container">
                             {% if post.user.avatar %}
@@ -139,7 +144,12 @@
             {% for post in posts %}
             <div class="card mb-3">
                 <div class="image-container">
-                    <img src="{{ post.photo.url }}" class="card-img-top">
+                    <img src="{{ post.photo.url }}" data-target="loader{{ forloop.counter0 }}" class="card-img-top">
+                    <div class="loader d-flex justify-content-center" id="loader{{ forloop.counter0 }}">
+                        <div class="spinner-border text-light my-auto" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body" id="idPost{{post.id}}">
                     <h5 class="card-title">{{post.event_date}} - {{ post.title }}</h5>
