@@ -2,18 +2,27 @@
 {% block content %}
 {% load extras_tags %}
     
-    <div class="card-header">
+    <div class="card-header family-header">
         <h5><strong>{{ family.name }}</strong></h5>
         Dernières actualités
-        <button id="newPostButton" class="btn btn-success" onclick="document.location.href='{% url 'newPost' family.id %}';"><i class="far fa-plus-square"></i> Créer un nouveau post</button>
+        <button id="newPostButton" class="btn btn-success btn-header" onclick="document.location.href='{% url 'newPost' family.id %}';"><i class="far fa-plus-square"></i> Créer un nouveau post</button>
         {% if user.is_staff %}
-            <button class="btn btn-secondary" onclick="document.location.href='{% url 'generateDocument' family.id %}';">Générer la gazette</button>
+            <button class="btn btn-secondary btn-header" onclick="document.location.href='{% url 'generateDocument' family.id %}';">Générer la gazette</button>
         {% endif %}
-        {% if carousel %}
-            <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' 'list' %}';"><i class="fas fa-list"></i></button>
-        {% else %}
-            <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' 'carousel' %}';"><i class="fas fa-photo-video"></i></button>
-        {% endif %}
+        <div style="margin-top: 5px;">
+            <form method="GET">
+                <select class="dynamic_attribute" name="paginate_by">
+                    <option value="3" {% if paginate_by == '3' %}selected{% endif %}>3</option>
+                    <option value="5" {% if paginate_by == '5' %}selected{% endif %}>5</option>
+                    <option value="10" {% if paginate_by == '10' %}selected{% endif %}>10</option>
+                </select>
+            </form>
+            {% if carousel %}
+                <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' 'list' %}';"><i class="fas fa-list"></i></button>
+            {% else %}
+                <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' 'carousel' %}';"><i class="fas fa-photo-video"></i></button>
+            {% endif %}
+        </div>
     </div>
     <div class="card-body">
         {% if posts %}
@@ -21,14 +30,19 @@
             <div class="card">
                 <div id="myCarousel" class="carousel slide" data-ride="carousel">
                   <ol class="carousel-indicators">
-                    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-                    <li data-target="#myCarousel" data-slide-to="1"></li>
-                    <li data-target="#myCarousel" data-slide-to="2"></li>
+                    {% for post in posts %}
+                        <li data-target="#myCarousel" data-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></li>
+                    {% endfor %}
                   </ol>
                   <div class="carousel-inner">
                     {% for post in posts %}
-                    <div class="carousel-item {% if forloop.first %}active{% endif %}" data-interval="10000" style="max-height: 100vh;">
-                      <img src="{{ post.photo.url }}" class="d-block" alt="Photo" style="height: 100%;">
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}" data-interval="10000" style="max-height: 100vh; background-color: #ecf2f9;">
+                      <img src="{{ post.photo.url }}" data-target="loader{{ forloop.counter0 }}" class="d-block" alt="Photo" style="max-height: 100vh;">
+                      <div class="loader d-flex justify-content-center" id="loader{{ forloop.counter0 }}">
+                        <div class="spinner-border text-light my-auto" role="status">
+                            <span class="sr-only">Loading...</span>
+                          </div>
+                      </div>
                       <div class="carousel-caption d-block" style="background-color: rgba(0, 0, 0, 0.5); width: 100%; right: auto; left: auto;">
                         <div class="user_container">
                             {% if post.user.avatar %}
@@ -139,7 +153,12 @@
             {% for post in posts %}
             <div class="card mb-3">
                 <div class="image-container">
-                    <img src="{{ post.photo.url }}" class="card-img-top">
+                    <img src="{{ post.photo.url }}" data-target="loader{{ forloop.counter0 }}" class="card-img-top">
+                    <div class="loader d-flex justify-content-center" id="loader{{ forloop.counter0 }}">
+                        <div class="spinner-border text-light my-auto" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body" id="idPost{{post.id}}">
                     <h5 class="card-title">{{post.event_date}} - {{ post.title }}</h5>
