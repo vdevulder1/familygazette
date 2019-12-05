@@ -87,6 +87,12 @@ class ListPosts(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Post.objects.filter(family__id=self.kwargs['familyId'])
 
+    def get_paginate_by(self, queryset):
+        """
+        Paginate by specified value in querystring, or use default class property value.
+        """
+        return self.request.GET.get('paginate_by', self.paginate_by)
+
     def get_context_data(self, **kwargs):
         # Nous récupérons le contexte depuis la super-classe
         context = super(ListPosts, self).get_context_data(**kwargs)
@@ -102,6 +108,7 @@ class ListPosts(LoginRequiredMixin, ListView):
             context['carousel'] = True
         else:
             context['carousel'] = False
+        context['paginate_by'] = self.request.GET.get('paginate_by', self.paginate_by)
             
         return context
 
@@ -219,7 +226,7 @@ def create_post(request, familyId):
 
                 new_post.compressImage()
 
-                for member in selected_family.members.all().exclude(user=request.user) :
+                """ for member in selected_family.members.all().exclude(user=request.user) :
                     if member.postNewsletter and member.user.email :
                         subject = 'Nouveau post pour la famille ' + selected_family.name
                         content = 'Nouveau post : \'{0}\' par {1}'.format(new_post.title, request.user.username)
@@ -237,7 +244,7 @@ def create_post(request, familyId):
                             settings.EMAIL_HOST_USER,
                             [member.user.email],
                             html_message=html_message
-                        )
+                        ) """
 
             return redirect('family', familyId=familyId)
         else:

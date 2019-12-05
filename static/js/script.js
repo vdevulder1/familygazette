@@ -100,6 +100,10 @@ $(document).ready(function () {
         });
     });
 
+    $('.dynamic_attribute').on('change', function() {
+        this.form.submit();
+    });
+
 });
 
 function addComment(nb) {

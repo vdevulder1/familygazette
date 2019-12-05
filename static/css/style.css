@@ -60,7 +60,6 @@ li.dropdown:hover {
 }
 
 #newPostButton {
-  margin: 20px;
   padding: 10px;
   font-size: 20px;
 }
@@ -313,6 +312,15 @@ li.member {
   li.member {
     margin-left: 0px;
     margin-right: 0px;
+  }
+
+  .family-header {
+    display: inline-grid;
+  }
+
+  .btn-header {
+    margin-top: 5px;
+    margin-bottom: 5px;
   }
 }
 

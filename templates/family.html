@@ -2,18 +2,27 @@
 {% block content %}
 {% load extras_tags %}
     
-    <div class="card-header">
+    <div class="card-header family-header">
         <h5><strong>{{ family.name }}</strong></h5>
         Dernières actualités
-        <button id="newPostButton" class="btn btn-success" onclick="document.location.href='{% url 'newPost' family.id %}';"><i class="far fa-plus-square"></i> Créer un nouveau post</button>
+        <button id="newPostButton" class="btn btn-success btn-header" onclick="document.location.href='{% url 'newPost' family.id %}';"><i class="far fa-plus-square"></i> Créer un nouveau post</button>
         {% if user.is_staff %}
-            <button class="btn btn-secondary" onclick="document.location.href='{% url 'generateDocument' family.id %}';">Générer la gazette</button>
+            <button class="btn btn-secondary btn-header" onclick="document.location.href='{% url 'generateDocument' family.id %}';">Générer la gazette</button>
         {% endif %}
-        {% if carousel %}
-            <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' 'list' %}';"><i class="fas fa-list"></i></button>
-        {% else %}
-            <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' 'carousel' %}';"><i class="fas fa-photo-video"></i></button>
-        {% endif %}
+        <div style="margin-top: 5px;">
+            <form method="GET">
+                <select class="dynamic_attribute" name="paginate_by">
+                    <option value="3" {% if paginate_by == '3' %}selected{% endif %}>3</option>
+                    <option value="5" {% if paginate_by == '5' %}selected{% endif %}>5</option>
+                    <option value="10" {% if paginate_by == '10' %}selected{% endif %}>10</option>
+                </select>
+            </form>
+            {% if carousel %}
+                <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' 'list' %}';"><i class="fas fa-list"></i></button>
+            {% else %}
+                <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' 'carousel' %}';"><i class="fas fa-photo-video"></i></button>
+            {% endif %}
+        </div>
     </div>
     <div class="card-body">
         {% if posts %}
