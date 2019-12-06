@@ -94,10 +94,13 @@ $(document).ready(function () {
     resizeTextAreas();
 
     $('img').each(function(){
-        let target = $(this).attr('data-target');
-        $(this).ready(function() {
-            $(`#${target}`).remove();
-        });
+        if (this.complete) {
+            removeLoader(this);
+        } else {
+            this.addEventListener('load', function() {
+                removeLoader(this);
+            });
+        }
     });
 
     $('.dynamic_attribute').on('change', function() {
@@ -180,4 +183,9 @@ function resizeTextAreas() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
     });
+}
+
+function removeLoader(elem) {
+    let target = $(elem).attr('data-target');
+    $(`#${target}`).remove();
 }
