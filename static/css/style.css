@@ -211,7 +211,7 @@ li.member {
 }
 
 .imgDisplay {
-  max-width: 75%;
+  max-width: 100%;
   max-height: 50vh;
   margin-bottom: 30px;
   box-shadow: 0 0 1em black;

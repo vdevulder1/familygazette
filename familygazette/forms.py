@@ -2,6 +2,7 @@ from django import forms
 from .models import Family, Profile, Comment, Post, Suggestion
 from django.contrib.auth.models import User
 from datetime import date
+from PIL import Image
 
 class LoginForm(forms.Form):
     username = forms.CharField(label="Nom d'utilisateur", max_length=30)
@@ -13,12 +14,34 @@ class UserForm(forms.ModelForm):
         fields = ('first_name', 'last_name', 'email')
 
 class ProfileForm(forms.ModelForm):
+    x = forms.FloatField(widget=forms.HiddenInput(), required=False)
+    y = forms.FloatField(widget=forms.HiddenInput(), required=False)
+    width = forms.FloatField(widget=forms.HiddenInput(), required=False)
+    height = forms.FloatField(widget=forms.HiddenInput(), required=False)
+
     class Meta:
         model = Profile
-        fields = ('avatar', 'birthday', 'generalNewsletter', 'postNewsletter', 'commentNewsletter')
+        fields = ('avatar', 'birthday', 'generalNewsletter', 'postNewsletter', 'commentNewsletter', 'x', 'y', 'width', 'height')
         widgets = {
             'birthday': forms.SelectDateWidget(years=range(1950,2010))
         }
+
+    def save(self):
+        profile = super(ProfileForm, self).save()
+        
+        if profile.avatar :
+
+            x = self.cleaned_data.get('x')
+            y = self.cleaned_data.get('y')
+            w = self.cleaned_data.get('width')
+            h = self.cleaned_data.get('height')
+
+            image = Image.open(profile.avatar)
+            cropped_image = image.crop((x, y, w+x, h+y))
+            resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
+            resized_image.save(profile.avatar.path)
+
+        return profile
 
 class FamilyForm(forms.ModelForm):
     class Meta:

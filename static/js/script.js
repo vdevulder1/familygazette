@@ -107,6 +107,37 @@ $(document).ready(function () {
         this.form.submit();
     });
 
+    const image = document.getElementById('imgDisplay');
+    if (image) {
+        const cropper = new Cropper(image, {
+            aspectRatio: 1 / 1,
+            viewMode: 1,
+            guides: false,
+            center: false,
+            highlight: false,
+            background: false,
+            autoCropArea: 1,
+            minCropBoxWidth: 100,
+            minCropBoxHeight: 100,
+            crop(event) {
+                $("#id_x").val(event.detail.x);
+                $("#id_y").val(event.detail.y);
+                $("#id_height").val(event.detail.height);
+                $("#id_width").val(event.detail.width);
+            },
+        });
+    }
+
+    //preview of image input
+    $("#id_avatar").change(function () {
+        if (this.files && this.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                cropper.replace(e.target.result); //update of the cropper
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
 });
 
 function addComment(nb) {

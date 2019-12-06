@@ -7,10 +7,10 @@
    <div class="card-body text-center">
 
         {% if profile_form.avatar.value %}
-            <div>
-                <img class="imgDisplay avatar" src="/media/{{ profile_form.avatar.value }}">
-            </div>
             <div style="margin-bottom: 20px;">
+                <img class="imgDisplay" id="imgDisplay" src="/media/{{ profile_form.avatar.value }}">
+            </div>
+            <div style="margin-bottom: 20px; margin-top: 20px;">
                 <div class="btn-group dropright">
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-undo"></i> Tourner
@@ -30,6 +30,10 @@
                         </form>
                     </div>
                 </div>
+            </div>
+        {% else %}
+            <div style="margin-bottom: 20px;">
+                <img class="imgDisplay" id="imgDisplay" alt='avatar' src="#">
             </div>
         {% endif %}
 
