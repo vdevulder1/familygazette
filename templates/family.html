@@ -15,7 +15,10 @@
                     <option value="3" {% if paginate_by == '3' %}selected{% endif %}>3</option>
                     <option value="5" {% if paginate_by == '5' %}selected{% endif %}>5</option>
                     <option value="10" {% if paginate_by == '10' %}selected{% endif %}>10</option>
+                    <option value="15" {% if paginate_by == '15' %}selected{% endif %}>15</option>
+                    <option value="20" {% if paginate_by == '20' %}selected{% endif %}>20</option>
                 </select>
+                <input type="text" name="display" value="{% if carousel %}carousel{% else %}list{% endif %}" hidden>
             </form>
             {% if carousel %}
                 <button class="btn btn-sm" style="border-color: lightgray; float: right;" onclick="document.location.href='?{% url_replace 'display' 'list' %}';"><i class="fas fa-list"></i></button>
