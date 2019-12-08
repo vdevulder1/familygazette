@@ -42,6 +42,7 @@ urlpatterns = [
     path('', views.home),
     path('home', views.home, name="home"),
     path('family/<int:familyId>', views.ListPosts.as_view(), name='family'),
+    path('family/<int:familyId>/update', views.update_family, name='updateFamily'),
     path('profile/update', views.update_profile, name="updateProfile"),
     path('profile/<int:profileId>', views.get_profile, name="getProfile"),
     path('profile/me', views.my_profile, name="myProfile"),

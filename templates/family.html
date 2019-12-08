@@ -1,9 +1,90 @@
 {% extends "index.html" %}
 {% block content %}
 {% load extras_tags %}
+
+    <div class="card text-white" id="familyPhotoDiv">
+        {% if family.photo %}
+            <img src="{{ family.photo.url }}" data-target="familyPhoto" class="card-img" alt="Family picture">
+            <div class="loader d-flex justify-content-center" id="familyPhoto">
+                <div class="spinner-border text-light my-auto" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        {% else %}
+            <div style="margin: auto;">
+                No family picture available.
+            </div>
+        {% endif %}
+        <div id="familyPhotoOverlay">
+            <h5 class="card-title"><strong>{{ family.name }}</strong></h5>
+            <p class="card-text">{{ family.description }}</p>
+            <button class="btn btn-outline-light btn-overlay" type="button" data-toggle="modal" data-target="#modalUpdateFamily"><i class='fas fa-edit'></i></button>
+            <div class="modal fade" id="modalUpdateFamily" tabindex="-1" role="dialog" aria-labelledby="modalUpdateFamily" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content container-fluid" style="color: black;">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalUpdateFamily"><strong>Changement d'informations - {{ family.name }}</strong></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="text-center">
+                            {% if family.photo %}
+                                <div>
+                                    <img class="imgDisplay" id="imgDisplay" data-target="family" src="{{ family.photo.url }}">
+                                </div>
+                                <div style="margin-bottom: 20px; margin-top: 20px;">
+                                    <div class="btn-group dropright">
+                                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-undo"></i> Tourner
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <form method="POST">
+                                                {% csrf_token %}
+                                                <button class="dropdown-item" type="submit" formaction="{% url 'rotate' 'family' family.id  1 %}">90°</button>
+                                            </form>
+                                            <form method="POST">
+                                                {% csrf_token %}
+                                                <button class="dropdown-item" type="submit" formaction="{% url 'rotate' 'family' family.id 2 %}">180°</button>
+                                            </form>
+                                            <form method="POST">
+                                                {% csrf_token %}
+                                                <button class="dropdown-item" type="submit" formaction="{% url 'rotate' 'family' family.id 3 %}">270°</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div style="margin: auto; width:min-content;">
+                                    <img class="imgDisplay" id="imgDisplay" data-target="family" alt='FamilyPicture' src="#">
+                                </div>
+                            {% endif %}
+                            <form method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="description" class="col-form-label">Description</label>
+                                        <textarea class="form-control" id="description" name="description">{{ family.description }}</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="id_photo" class="col-form-label">Photo</label>
+                                        <input type="file" name="photo" accept="image/*" id="id_photo" value="{{family.photo}}">
+                                        <p class="text-muted"><small>Sélectionnez un fichier pour modifier l'image actuelle.</small></p>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>    
+                                    <button type="submit" class="btn btn-success" formaction="{% url 'updateFamily' family.id %}">Envoyer</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <div class="card-header family-header">
-        <h5><strong>{{ family.name }}</strong></h5>
         Dernières actualités
         <button id="newPostButton" class="btn btn-success btn-header" onclick="document.location.href='{% url 'newPost' family.id %}';"><i class="far fa-plus-square"></i> Créer un nouveau post</button>
         {% if user.is_staff %}

@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import date
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from PIL import Image
 from io import BytesIO
@@ -72,6 +72,7 @@ class Family(models.Model):
     description = models.TextField(max_length=100)
     creation_date = models.DateTimeField(default=timezone.now, verbose_name="Date de création")
     members = models.ManyToManyField(Profile)
+    photo = models.ImageField(null=True, blank=True, upload_to="photos/")
 
     class Meta :
         ordering = ['name']
@@ -143,6 +144,10 @@ class Post(models.Model):
         post
         """
         return self.comment_set.all()
+
+@receiver(pre_delete, sender=Post)
+def delete_post(sender, instance, **kwargs):
+    instance.photo.delete()
 
 class Comment(models.Model):
     date = models.DateTimeField(verbose_name="Date de publication", auto_now_add=True, auto_now=False)
