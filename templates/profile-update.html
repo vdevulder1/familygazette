@@ -7,8 +7,8 @@
    <div class="card-body text-center">
 
         {% if profile_form.avatar.value %}
-            <div style="margin-bottom: 20px;">
-                <img class="imgDisplay" id="imgDisplay" src="/media/{{ profile_form.avatar.value }}">
+            <div>
+                <img class="imgDisplay" id="imgDisplay" data-target="profile" src="/media/{{ profile_form.avatar.value }}">
             </div>
             <div style="margin-bottom: 20px; margin-top: 20px;">
                 <div class="btn-group dropright">
@@ -32,8 +32,8 @@
                 </div>
             </div>
         {% else %}
-            <div style="margin-bottom: 20px;">
-                <img class="imgDisplay" id="imgDisplay" alt='avatar' src="#">
+            <div>
+                <img class="imgDisplay" id="imgDisplay" data-target="profile" alt='avatar' src="#">
             </div>
         {% endif %}
 

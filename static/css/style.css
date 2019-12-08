@@ -110,7 +110,7 @@ img {
 
 .card-img-top {
   max-width: 100%;
-  max-height: 100%;
+  max-height: 85vh;
   width: auto !important;
 }
 
@@ -214,6 +214,7 @@ li.member {
   max-width: 100%;
   max-height: 50vh;
   margin-bottom: 30px;
+  margin-top: 20px !important;
   box-shadow: 0 0 1em black;
 }
 
@@ -248,6 +249,37 @@ li.member {
   margin-top: auto;
   margin-bottom: auto;
   margin-left: auto;
+}
+
+#familyPhotoDiv {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  top: 0;
+  right: 0;
+  left: 0; max-height: 60vh;
+  min-height: 25vh;
+  overflow-y: hidden; border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+#familyPhotoOverlay {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  padding: 1.25rem;
+}
+
+#familyPhotoOverlay:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.btn-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 @media (min-width: 768px) {

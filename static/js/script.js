@@ -108,7 +108,7 @@ $(document).ready(function () {
     });
 
     const image = document.getElementById('imgDisplay');
-    if (image) {
+    if (image && $(image).attr('data-target') == 'profile') {
         const cropper = new Cropper(image, {
             aspectRatio: 1 / 1,
             viewMode: 1,
@@ -134,6 +134,16 @@ $(document).ready(function () {
             var reader = new FileReader();
             reader.onload = function (e) {
                 cropper.replace(e.target.result); //update of the cropper
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    $("#id_photo").change(function () {
+        if (this.files && this.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#imgDisplay').attr('src', e.target.result);
             }
             reader.readAsDataURL(this.files[0]);
         }

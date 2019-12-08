@@ -93,3 +93,8 @@ class ConversationForm(forms.Form):
 
 class MessageForm(forms.Form):
     content = forms.CharField(required=True)
+
+class FamilyForm(forms.ModelForm):
+    class Meta:
+        model = Family
+        fields = ('description', 'photo')

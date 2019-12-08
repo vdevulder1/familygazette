@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.views.generic import ListView, DeleteView
 from django.contrib.auth.decorators import login_required
 from .models import Family, Post, Comment, Profile, Suggestion, Gazette, Conversation, Message
-from .forms import LoginForm, UserForm, ProfileForm, PostForm, UpdatePostForm, CommentForm, SuggestionForm, MailForm, ConversationForm, MessageForm
+from .forms import LoginForm, UserForm, ProfileForm, PostForm, UpdatePostForm, CommentForm, SuggestionForm, MailForm, ConversationForm, MessageForm, FamilyForm
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
@@ -184,6 +184,25 @@ def update_profile(request):
     })
 
 @login_required
+@require_POST
+def update_family(request, familyId):
+
+    family = get_object_or_404(Family, id=familyId)
+    if family in request.user.profile.families :
+        form = FamilyForm(request.POST, request.FILES, instance=family)
+        if form.is_valid():
+            family.description = form.cleaned_data['description']
+            if form.cleaned_data['photo'] != None:
+                family.photo = form.cleaned_data['photo']
+            family.save()
+
+            return redirect('family', familyId=familyId)
+        else :
+            raise ValidationError
+    else :
+        raise PermissionDenied
+
+@login_required
 def create_post(request, familyId):
 
     family = get_object_or_404(Family, id=familyId)
@@ -304,7 +323,6 @@ def delete_post(request, postId):
     post = get_object_or_404(Post, id=postId)
     if request.user.profile == post.user :
         familyId = post.family.id
-        post.photo.delete()
         post.delete()
 
         return redirect('family', familyId=familyId)
@@ -582,6 +600,12 @@ def rotate_img(request, model, modelId, rotation):
     elif model == 'profile':
         obj = get_object_or_404(Profile, id=request.user.id)
         path = obj.avatar.path
+    elif model == 'family':
+        obj = get_object_or_404(Family, id=modelId)
+        if obj in request.user.profile.families:
+            path = obj.photo.path
+        else :
+            raise PermissionDenied
     else :
         raise ObjectDoesNotExist
     
@@ -593,6 +617,8 @@ def rotate_img(request, model, modelId, rotation):
 
     if model == 'profile':
         return redirect('updateProfile')
+    elif model == 'family':
+        return redirect('family', modelId)
     else : 
         return redirect('update{0}'.format(model.capitalize()), modelId)
 

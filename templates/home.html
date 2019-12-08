@@ -9,6 +9,16 @@
         <div class="card-deck">
             {% for family in user.profile.families %}
                 <div class="card">
+                    {% if family.photo %}
+                    <div class="card" style="background-color: #ecf2f9;">
+                        <img class="card-img-top" src="{{ family.photo.url }}" data-target="familyPhoto{{forloop.counter0}}" style="max-width: 100%; max-height: 50vh;">
+                        <div class="loader d-flex justify-content-center" id="familyPhoto{{forloop.counter0}}">
+                            <div class="spinner-border text-light my-auto" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                     <div class="card-body">
                         <h5 class="card-title"><strong>{{family.name}}</strong></h5>
                         <p class="card-text">{{family.description}}</p>
