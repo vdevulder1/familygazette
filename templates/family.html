@@ -4,7 +4,7 @@
 
     <div class="card text-white" id="familyPhotoDiv">
         {% if family.photo %}
-            <img src="{{ family.photo.url }}" data-target="familyPhoto" class="card-img" alt="Family picture">
+            <img src="{{ family.photo.url }}" data-target="familyPhoto" class="card-img" alt="Family picture" style="max-height: 100%; width: auto;">
             <div class="loader d-flex justify-content-center" id="familyPhoto">
                 <div class="spinner-border text-light my-auto" role="status">
                     <span class="sr-only">Loading...</span>
@@ -55,7 +55,7 @@
                                     </div>
                                 </div>
                             {% else %}
-                                <div style="margin: auto; width:min-content;">
+                                <div style="margin: auto; width:max-content;">
                                     <img class="imgDisplay" id="imgDisplay" data-target="family" alt='FamilyPicture' src="#">
                                 </div>
                             {% endif %}

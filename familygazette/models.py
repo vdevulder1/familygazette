@@ -21,28 +21,7 @@ class Profile(models.Model):
         return self.user.username
 
     def compressAvatar(self):
-        imageTemproary = Image.open(self.avatar.path)
-        outputIoStream = BytesIO()
-
-        width, height = imageTemproary.size
-        if width == max(width, height) and width > 960 :
-            ratio = height/width
-            new_width = 960
-            new_height = int(ratio*new_width)
-            imageTemproary = imageTemproary.resize((new_width, new_height), Image.ANTIALIAS)
-        elif height == max(width, height) and height > 540 :
-            ratio = width/height
-            new_height = 540
-            new_width = int(ratio*new_height)
-            imageTemproary = imageTemproary.resize((new_width, new_height), Image.ANTIALIAS)
-        
-        imageTemproary = imageTemproary.convert("RGB")
-        imageTemproary.save(outputIoStream , format='JPEG', optimize=True, quality=95)
-        outputIoStream.seek(0)
-        name = self.avatar.name.split('.')[0]
-        self.avatar.delete()
-        self.avatar = InMemoryUploadedFile(outputIoStream,'ImageField', "%s.jpg" % name, 'image/jpeg', sys.getsizeof(outputIoStream), None)
-        self.save()
+        compress_Image(self, 'avatar', 960, 540)
 
     @property
     def families(self):
@@ -98,6 +77,9 @@ class Family(models.Model):
         """
         return self.gazette_set.exclude(seenBy__id=user.id).count()
 
+    def compressImage(self):
+        compress_Image(self, 'photo', 1920, 1080)
+
 class Post(models.Model):
     title = models.CharField(max_length=100)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
@@ -114,28 +96,7 @@ class Post(models.Model):
         return self.title
 
     def compressImage(self):
-        imageTemproary = Image.open(self.photo.path)
-        outputIoStream = BytesIO()
-
-        width, height = imageTemproary.size
-        if width == max(width, height) and width > 1920 :
-            ratio = height/width
-            new_width = 1920
-            new_height = int(ratio*new_width)
-            imageTemproary = imageTemproary.resize((new_width, new_height), Image.ANTIALIAS)
-        elif height == max(width, height) and height > 1080 :
-            ratio = width/height
-            new_height = 1080
-            new_width = int(ratio*new_height)
-            imageTemproary = imageTemproary.resize((new_width, new_height), Image.ANTIALIAS)
-        
-        imageTemproary = imageTemproary.convert("RGB")
-        imageTemproary.save(outputIoStream , format='JPEG', optimize=True, quality=70)
-        outputIoStream.seek(0)
-        name = self.photo.name.split('.')[0]
-        self.photo.delete()
-        self.photo = InMemoryUploadedFile(outputIoStream,'ImageField', "%s.jpg" % name, 'image/jpeg', sys.getsizeof(outputIoStream), None)
-        self.save()
+        compress_Image(self, 'photo', 1920, 1080)
 
     @property
     def comments(self):
@@ -216,3 +177,39 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['date']
+
+
+def compress_Image(element, parameter, max_width, max_height):
+        if parameter == 'photo' :
+            obj = element.photo
+        elif parameter == 'avatar' :
+            obj = element.avatar
+        else :
+            return None
+
+        imageTemproary = Image.open(obj.path)
+        outputIoStream = BytesIO()
+
+        width, height = imageTemproary.size
+        if width == max(width, height) and width > max_width :
+            ratio = height/width
+            new_width = max_width
+            new_height = int(ratio*new_width)
+            imageTemproary = imageTemproary.resize((new_width, new_height), Image.ANTIALIAS)
+        elif height == max(width, height) and height > max_height :
+            ratio = width/height
+            new_height = max_height
+            new_width = int(ratio*new_height)
+            imageTemproary = imageTemproary.resize((new_width, new_height), Image.ANTIALIAS)
+        
+        imageTemproary = imageTemproary.convert("RGB")
+        imageTemproary.save(outputIoStream , format='JPEG', optimize=True, quality=70)
+        outputIoStream.seek(0)
+        name = obj.name.split('.')[0]
+        obj.delete()
+        if parameter == 'photo' :
+            element.photo = InMemoryUploadedFile(outputIoStream,'ImageField', "%s.jpg" % name, 'image/jpeg', sys.getsizeof(outputIoStream), None)
+        elif parameter == 'avatar' :
+            element.avatar = InMemoryUploadedFile(outputIoStream,'ImageField', "%s.jpg" % name, 'image/jpeg', sys.getsizeof(outputIoStream), None)
+        
+        element.save()
