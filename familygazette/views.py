@@ -191,10 +191,17 @@ def update_family(request, familyId):
     if family in request.user.profile.families :
         form = FamilyForm(request.POST, request.FILES, instance=family)
         if form.is_valid():
+            photoHasChanged = False
             family.description = form.cleaned_data['description']
-            if form.cleaned_data['photo'] != None:
-                family.photo = form.cleaned_data['photo']
-            family.save()
+            if form.cleaned_data['photo'] != None and 'photo' in form.changed_data :
+                get_object_or_404(Family, id=familyId).photo.delete()
+                photoHasChanged = True
+                form.save()
+            else :
+                family.save()
+
+            if photoHasChanged :
+                get_object_or_404(Family, id=familyId).compressImage()
 
             return redirect('family', familyId=familyId)
         else :
